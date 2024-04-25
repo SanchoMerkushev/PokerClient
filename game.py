@@ -24,7 +24,17 @@ class Player:
         pass
 
     def my_combination(self, table_cards):
-        return count_combination(self.cards + table_cards)
+        self.my_combination_tuple = count_combination(self.cards + table_cards)
+        self.create_my_combination_str();
+        return self.my_combination_tuple
+
+    def create_my_combination_str(self):
+        combination_str = COMBINATIONS[self.my_combination_tuple[0]]
+        combination_str += " " + str(self.my_combination_tuple[1])
+        if self.my_combination_tuple[2] is not None:
+            combination_str += " with another cards" + str(self.my_combination_tuple[2])
+        self.my_combination_str = combination_str
+        
 
 
 class HumanPlayer(Player):
@@ -45,6 +55,7 @@ class Round:
     def __init__(self, players):
         self.players = players
         self.dealing_cards()
+        self.sum_bid = 0
 
     def dealing_cards(self):
         amount_cards = CARDS_ON_TABLE + len(self.players) * CARDS_ON_HAND
@@ -54,29 +65,36 @@ class Round:
             self.players[i].cards = [cards[CARDS_ON_TABLE + i * CARDS_ON_HAND], cards[CARDS_ON_TABLE + i * CARDS_ON_HAND + 1]]
 
     def finish_round(self):
-        win_player = self.players[0]
-        for i in range(1, len(self.players)):
-            if self.players[i].my_combination(self.table_cards) > win_player.my_combination(self.table_cards):
-                win_player =  self.players[i]
-        print()
-        print("WIN")
-        print(win_player.cards)
-        print(win_player.my_combination(game.table_cards))
+        win_players = []
+        win_combination = -1, None, None
+        for player in self.players:
+            if player.my_combination(self.table_cards) > win_combination:
+                win_players = [player]
+            elif player.my_combination(self.table_cards) == win_combination:
+                win_players.append(player)
+            win_combination = max(win_combination, player.my_combination(self.table_cards))
+        for player in win_players:
+            player.balance += self.sum_bid / len(win_players)
+        
 
 
 
 cur_players = []
-for name in ["Bob", "Mike", "Tom", "Jhon", "Ivan"]:
+for name in ["Bob", "Mike", "Tom", "Jhon"]:
     cur_players.append(HumanPlayer(name))
-game = Round(cur_players)
-
-print(game.table_cards)
-print()
-for player in cur_players:
-    print(player.cards)
-    print(player.my_combination(game.table_cards))
-    print()
-game.finish_round()
+for _ in range(5):
+    game = Round(cur_players)
+    print("TABLE ", game.table_cards)
+    for player in cur_players:
+        print(player.name, player.cards)
+        player.my_combination(game.table_cards)
+        print(player.my_combination_str)
+        print()
+        player.balance -= 100
+        game.sum_bid += 100
+    game.finish_round()
+    for player in cur_players:
+        print(player.name, player.balance)
 
 
     

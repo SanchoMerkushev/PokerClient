@@ -8,7 +8,6 @@ def count_combination(cards):
         suits_list[suit].append(rank)
     for i in range(AMOUNT_SUITS):
         suits_list[i].sort(reverse=True)
-    print(suits_list)
     ranks_count = ranks_count + ranks_count
     pair, second_pair, three_of_a_kind, straight, flush, four_of_a_kind = [None] * 6
 
@@ -33,25 +32,25 @@ def count_combination(cards):
             flush = suits_list[i][-5:]
 
     if straight is not None and flush is not None and straight == AMOUNT_RANKS - 1:
-        return COMBINATIONS.index("Royal Flush"), None, None
+        return 9, straight, []
     elif straight is not None and flush is not None:
-        return COMBINATIONS.index("Straight Flush"), straight, None
+        return 8, straight, []
     elif four_of_a_kind is not None:
-        return COMBINATIONS.index("Four of a Kind"), four_of_a_kind, high_cards[:1]
+        return 7, four_of_a_kind, high_cards[:1]
     elif pair is not None and three_of_a_kind is not None:
-        return COMBINATIONS.index("Full House"), [three_of_a_kind, pair], None
+        return 6, [three_of_a_kind, pair], []
     elif flush is not None:
-        return COMBINATIONS.index("Flush"), flush, None
+        return 5, flush, []
     elif straight is not None:
-        return COMBINATIONS.index("Straight"), straight, None
+        return 4, straight, []
     elif three_of_a_kind is not None:
-        return COMBINATIONS.index("Three of a Kind"), three_of_a_kind, high_cards[:2]
+        return 3, three_of_a_kind, high_cards[:2]
     elif second_pair is not None:
-        return COMBINATIONS.index("Two Pairs"), [pair, second_pair], high_cards[:1]
+        return 2, [pair, second_pair], high_cards[:1]
     elif pair is not None:
-        return COMBINATIONS.index("Pair"), pair, high_cards[:3]
+        return 1, pair, high_cards[:3]
     else:
-        return COMBINATIONS.index("High Card"), None, high_cards[:5]
+        return 0, high_cards[0], high_cards[1:5]
 
 '''
 test_cards = ((1, 2), (5, 2), (4, 2), (7, 2), (8, 2), (6, 1), (11, 2))
