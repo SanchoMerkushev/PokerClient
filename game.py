@@ -9,19 +9,23 @@ Class Player is abstrasc class for subclasses HumanPlayer and ComputerPlayer
 class Player:
 
     def __init__(self, name):
-        self.balance = START_BALANCE
         self.name = name
+        self.balance = START_BALANCE
         self.bid = 0
         self.cards = None
-        self.cur_game = None
+        self.fold = False
+        self.raise_bid = False
+        self.first_bid_of_round = True
 
     def exit_from_game(self):
         '''Exit game and free place for another players'''
         pass
 
-    def turn(self):
-        '''Fold or call or raise'''
+    def turn(self, opponent_bid):
         pass
+
+            
+        
 
     def my_combination(self, table_cards):
         self.my_combination_tuple = count_combination(self.cards + table_cards)
@@ -39,12 +43,37 @@ class Player:
 
 class HumanPlayer(Player):
 
-    def turn(self):
-        pass
+    def turn(self, opponent_bid):
+        '''Fold or call or raise'''
+        print(f"{self.name} your bid {self.bid} opponent bid is {opponent_bid}")
+        if self.bid < opponent_bid:
+            print(f"CALL costs {opponent_bid - self.bid} or RAISE smth over opponent bid or FOLD")
+        else:
+            print("CALL (it is free) or RAISE")
+        print("write FOLD or CALL or RAISE [x]")
+        command = input().split()
+        while True:
+            if command[0] == "FOLD":
+                self.fold = True
+                self.raise_bid = False
+                break
+            elif command[0] == "CALL":
+                self.balance -= opponent_bid - self.bid
+                self.bid = opponent_bid
+                self.raise_bid = False
+                break
+            elif command[0] == "RAISE":
+                amount = int(command[1])
+                self.balance -= opponent_bid - self.bid + amount
+                self.bid = opponent_bid + amount
+                self.raise_bid = True
+                break
+            else:
+                print("wrong command try FOLD or CALL or RAISE")
 
 class ComputerPlayer(Player):
 
-    def turn(self):
+    def turn(self, opponent_bid):
         pass
 
 '''
@@ -55,7 +84,11 @@ class Round:
     def __init__(self, players):
         self.players = players
         self.dealing_cards()
+        self.max_bid = 0
         self.sum_bid = 0
+        self.table_cards = None
+        self.viseble_cards = ["XX"] * 5
+        self.dealing_cards()
 
     def dealing_cards(self):
         amount_cards = CARDS_ON_TABLE + len(self.players) * CARDS_ON_HAND
@@ -68,33 +101,62 @@ class Round:
         win_players = []
         win_combination = -1, None, None
         for player in self.players:
+            if player.fold:
+                continue
             if player.my_combination(self.table_cards) > win_combination:
                 win_players = [player]
             elif player.my_combination(self.table_cards) == win_combination:
                 win_players.append(player)
             win_combination = max(win_combination, player.my_combination(self.table_cards))
         for player in win_players:
+            print(f"{player.name} win {self.sum_bid / len(win_players)} with {player.my_combination_str}")
             player.balance += self.sum_bid / len(win_players)
-        
 
+
+    def turn(self):
+        opponent_bid = 0
+        end_round = True
+        while end_round:
+            end_round = False
+            for player in self.players:
+                if not player.fold and not(player.bid == opponent_bid and not player.first_bid_of_round):
+                    player.turn(opponent_bid)
+                    opponent_bid = max(opponent_bid, player.bid)
+                    end_round = end_round or player.raise_bid
+                player.first_bid_of_round = False
+        for player in self.players:
+            player.first_bid_of_round = True
+            self.sum_bid += player.bid
+            player.bid = 0
+
+    def play(self):
+        print(self.viseble_cards, "Total bids", self.sum_bid)
+        self.turn()
+        self.viseble_cards[0], self.viseble_cards[1], self.viseble_cards[2] = self.table_cards[0], self.table_cards[1], self.table_cards[2]
+        print(self.viseble_cards, "Total bids", self.sum_bid)
+        self.turn()
+        self.viseble_cards[3] = self.table_cards[3]
+        print(self.viseble_cards, "Total bids", self.sum_bid)
+        self.turn()
+        self.viseble_cards[4] = self.table_cards[4]
+        print(self.viseble_cards, "Total bids", self.sum_bid)
+        self.turn()
+        self.finish_round()
 
 
 cur_players = []
-for name in ["Bob", "Mike", "Tom", "Jhon"]:
+for name in ["Bob", "Mike", "Ann"]:
     cur_players.append(HumanPlayer(name))
-for _ in range(5):
+for _ in range(2):
     game = Round(cur_players)
-    print("TABLE ", game.table_cards)
     for player in cur_players:
         print(player.name, player.cards)
         player.my_combination(game.table_cards)
-        print(player.my_combination_str)
-        print()
-        player.balance -= 100
-        game.sum_bid += 100
-    game.finish_round()
+    print()
+    game.play()
     for player in cur_players:
         print(player.name, player.balance)
+    print()
 
 
     
