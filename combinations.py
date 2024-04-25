@@ -15,7 +15,7 @@ def count_combination(cards):
         if ranks_count[i] == 1:
             high_cards = [i] + high_cards
         if ranks_count[i] == 2:
-            if pair:
+            if pair is not None:
                 second_pair = pair
             pair = i
         elif ranks_count[i] == 3:
@@ -30,27 +30,27 @@ def count_combination(cards):
                 if ranks_count[j]:
                     flush = j
     if straight is not None and flush is not None and straight == AMOUNT_RANKS - 1:
-        return "Royal Flush", None, None
+        return COMBINATIONS.index("Royal Flush"), None, None
     elif straight is not None and flush is not None:
-        return "Straight Flush", straight, None
+        return COMBINATIONS.index("Straight Flush"), straight, None
     elif four_of_a_kind is not None:
-        return "Four of a Kind", four_of_a_kind, high_cards[:1]
+        return COMBINATIONS.index("Four of a Kind"), four_of_a_kind, high_cards[:1]
     elif pair is not None and three_of_a_kind is not None:
-        return "Full House", (three_of_a_kind, pair), None
+        return COMBINATIONS.index("Full House"), (three_of_a_kind, pair), None
     elif flush is not None:
-        return "Flush", flush, None
+        return COMBINATIONS.index("Flush"), flush, None
     elif straight is not None:
-        return "Straight", straight, None
+        return COMBINATIONS.index("Straight"), straight, None
     elif three_of_a_kind is not None:
-        return "Three of a Kind", three_of_a_kind, high_cards[:2]
+        return COMBINATIONS.index("Three of a Kind"), three_of_a_kind, high_cards[:2]
     elif second_pair is not None:
-        return "Two Pairs", (pair, second_pair), high_cards[:1]
+        return COMBINATIONS.index("Two Pairs"), (pair, second_pair), high_cards[:1]
     elif pair is not None:
-        return "Pair", pair, high_cards[:3]
+        return COMBINATIONS.index("Pair"), pair, high_cards[:3]
     else:
-        return "High Card", None, high_cards[:5]
+        return COMBINATIONS.index("High Card"), None, high_cards[:5]
 
-
+'''
 test_cards = ((1, 2), (5, 2), (4, 2), (7, 2), (8, 2), (6, 1), (11, 2))
 print(count_combination(test_cards))
 test_cards = ((0, 1), (0, 2), (8, 1), (8, 2), (7, 3), (4, 1), (4, 2))
@@ -61,3 +61,8 @@ test_cards = ((0, 1), (1, 2), (8, 1), (8, 2), (9, 3), (4, 1), (5, 2))
 print(count_combination(test_cards))
 test_cards = ((0, 1), (1, 1), (4, 1), (8, 1), (9, 1), (6, 1), (5, 2))
 print(count_combination(test_cards))
+test_cards = ((8, 2), (8, 3), (0, 1), (3, 1), (2, 2), (0, 0), (1, 1))
+print(count_combination(test_cards))
+'''
+
+
