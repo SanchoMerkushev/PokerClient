@@ -1,12 +1,11 @@
+"""Main game mechanics module."""
 from random import sample
-from constants import *
-from combinations import *
+from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
+from combinations import count_combination
 
 
-'''
-Class Player is abstrasc class for subclasses HumanPlayer and ComputerPlayer
-'''
 class Player:
+    """Class Player is abstract class for subclasses HumanPlayer and ComputerPlayer."""
 
     def __init__(self, name):
         self.name = name
@@ -18,33 +17,33 @@ class Player:
         self.first_bid_of_round = True
 
     def exit_from_game(self):
-        '''Exit game and free place for another players'''
+        """Exit game and free place for another players."""
         pass
 
     def turn(self, opponent_bid):
+        """Player input."""
         pass
 
-            
-        
-
     def my_combination(self, table_cards):
+        """Return combinations."""
         self.my_combination_tuple = count_combination(self.cards + table_cards)
-        self.create_my_combination_str();
+        self.create_my_combination_str()
         return self.my_combination_tuple
 
     def create_my_combination_str(self):
+        """Make a pretty string with combinations."""
         combination_str = COMBINATIONS[self.my_combination_tuple[0]]
         combination_str += " " + str(self.my_combination_tuple[1])
         if self.my_combination_tuple[2] is not None:
             combination_str += " with another cards" + str(self.my_combination_tuple[2])
         self.my_combination_str = combination_str
-        
 
 
 class HumanPlayer(Player):
+    """Implementation of Player class for Human input."""
 
     def turn(self, opponent_bid):
-        '''Fold or call or raise'''
+        """Fold or call or raise."""
         print(f"{self.name} your bid {self.bid} opponent bid is {opponent_bid}")
         if self.bid < opponent_bid:
             print(f"CALL costs {opponent_bid - self.bid} or RAISE smth over opponent bid or FOLD")
@@ -71,15 +70,17 @@ class HumanPlayer(Player):
             else:
                 print("wrong command try FOLD or CALL or RAISE")
 
+
 class ComputerPlayer(Player):
+    """Implementation of Player class for Bot player."""
 
     def turn(self, opponent_bid):
+        """Bot logic."""
         pass
 
-'''
-One Round of game
-'''
+
 class Round:
+    """One Round of game."""
 
     def __init__(self, players):
         self.players = players
@@ -91,13 +92,16 @@ class Round:
         self.dealing_cards()
 
     def dealing_cards(self):
+        """Shaffle and deal cards to players and table."""
         amount_cards = CARDS_ON_TABLE + len(self.players) * CARDS_ON_HAND
         cards = sample(ALL_CARDS, amount_cards)
         self.table_cards = cards[:CARDS_ON_TABLE]
         for i in range(len(self.players)):
-            self.players[i].cards = [cards[CARDS_ON_TABLE + i * CARDS_ON_HAND], cards[CARDS_ON_TABLE + i * CARDS_ON_HAND + 1]]
+            self.players[i].cards = [cards[CARDS_ON_TABLE + i * CARDS_ON_HAND],
+                                     cards[CARDS_ON_TABLE + i * CARDS_ON_HAND + 1]]
 
     def finish_round(self):
+        """Check wining conditions at last round."""
         win_players = []
         win_combination = -1, None, None
         for player in self.players:
@@ -112,14 +116,14 @@ class Round:
             print(f"{player.name} win {self.sum_bid / len(win_players)} with {player.my_combination_str}")
             player.balance += self.sum_bid / len(win_players)
 
-
     def turn(self):
+        """Round logic."""
         opponent_bid = 0
         end_round = True
         while end_round:
             end_round = False
             for player in self.players:
-                if not player.fold and not(player.bid == opponent_bid and not player.first_bid_of_round):
+                if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
                     player.turn(opponent_bid)
                     opponent_bid = max(opponent_bid, player.bid)
                     end_round = end_round or player.raise_bid
@@ -130,9 +134,11 @@ class Round:
             player.bid = 0
 
     def play(self):
+        """Game loop."""
         print(self.viseble_cards, "Total bids", self.sum_bid)
         self.turn()
-        self.viseble_cards[0], self.viseble_cards[1], self.viseble_cards[2] = self.table_cards[0], self.table_cards[1], self.table_cards[2]
+        self.viseble_cards[0], self.viseble_cards[1], self.viseble_cards[2] = \
+            self.table_cards[0], self.table_cards[1], self.table_cards[2]
         print(self.viseble_cards, "Total bids", self.sum_bid)
         self.turn()
         self.viseble_cards[3] = self.table_cards[3]
@@ -157,8 +163,3 @@ for _ in range(2):
     for player in cur_players:
         print(player.name, player.balance)
     print()
-
-
-    
-
-    
