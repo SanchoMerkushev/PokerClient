@@ -1,5 +1,6 @@
 """Main game mechanics module."""
 from random import sample
+import socket
 from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
 from combinations import count_combination
 
@@ -149,17 +150,28 @@ class Round:
         self.turn()
         self.finish_round()
 
+class Game:
+    """Main game class."""
+    
+    def __init__(self, players, max_rounds):
+        self.players = players
+        self.max_rounds = max_rounds
+    
+    def start(self):
+        """Start a game."""
+        cur_players = self.players
+        for _ in range(self.max_rounds):
+            game = Round(cur_players)
+            for player in cur_players:
+                print(player.name, player.cards)
+                player.my_combination(game.table_cards)
+            print()
+            game.play()
+            for player in cur_players:
+                print(player.name, player.balance)
+            print()
 
-cur_players = []
+players = []
 for name in ["Bob", "Mike", "Ann"]:
-    cur_players.append(HumanPlayer(name))
-for _ in range(2):
-    game = Round(cur_players)
-    for player in cur_players:
-        print(player.name, player.cards)
-        player.my_combination(game.table_cards)
-    print()
-    game.play()
-    for player in cur_players:
-        print(player.name, player.balance)
-    print()
+    players.append(HumanPlayer(name))
+Game(players, 2).start()
