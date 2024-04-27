@@ -50,8 +50,8 @@ class HumanPlayer(Player):
         else:
             print("CALL (it is free) or RAISE")
         print("write FOLD or CALL or RAISE [x]")
-        command = input().split()
         while True:
+            command = input().split()
             if command[0] == "FOLD":
                 self.fold = True
                 self.raise_bid = False
