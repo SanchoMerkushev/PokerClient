@@ -1,6 +1,9 @@
-from constants import *
+"""Game combinations."""
+from constants import AMOUNT_RANKS, AMOUNT_SUITS
+
 
 def count_combination(cards):
+    """Count winning combination based on player hand."""
     ranks_count = [0] * AMOUNT_RANKS
     suits_list = [[] for _ in range(AMOUNT_SUITS)]
     for rank, suit in cards:
@@ -52,6 +55,7 @@ def count_combination(cards):
     else:
         return 0, high_cards[0], high_cards[1:5]
 
+
 '''
 test_cards = ((1, 2), (5, 2), (4, 2), (7, 2), (8, 2), (6, 1), (11, 2))
 print(count_combination(test_cards))
@@ -68,4 +72,3 @@ print(count_combination(test_cards))
 test_cards = ((11, 3), (1, 0), (2, 1), (12, 1), (6, 1), (9, 1), (0, 1))
 print(count_combination(test_cards))
 '''
-

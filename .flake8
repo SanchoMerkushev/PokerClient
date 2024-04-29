@@ -1,0 +1,6 @@
+[flake8]
+# Ignore complexity analyzer for now
+extend-ignore = C901
+exclude = .git,__pycache__
+max-line-length = 120
+docstring-convention=numpy
