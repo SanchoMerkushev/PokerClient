@@ -1,7 +1,11 @@
 """Main game mechanics module."""
 from random import sample
+import socket
+import json
+
 from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
 from combinations import count_combination
+from misc import recv_end, END
 
 
 class Player:
@@ -42,6 +46,15 @@ class Player:
 class HumanPlayer(Player):
     """Implementation of Player class for Human input."""
 
+    def __init__(self, name, conn, addr):
+        super().__init__(name)
+        self.conn = conn
+        self.addr = addr
+
+    def close(self):
+        """Disconnect player."""
+        self.conn.close()
+
     def turn(self, opponent_bid):
         """Fold or call or raise."""
         print(f"{self.name} your bid {self.bid} opponent bid is {opponent_bid}")
@@ -51,7 +64,8 @@ class HumanPlayer(Player):
             print("CALL (it is free) or RAISE")
         print("write FOLD or CALL or RAISE [x]")
         while True:
-            command = input().split()
+            command = recv_end(self.conn, END)
+            command = list(map(str.upper, command.split()))
             if command[0] == "FOLD":
                 self.fold = True
                 self.raise_bid = False
@@ -84,12 +98,11 @@ class Round:
 
     def __init__(self, players):
         self.players = players
+        self.table_cards = None
         self.dealing_cards()
         self.max_bid = 0
         self.sum_bid = 0
-        self.table_cards = None
-        self.viseble_cards = ["XX"] * 5
-        self.dealing_cards()
+        self.visible_cards = ["XX"] * 5
 
     def dealing_cards(self):
         """Shaffle and deal cards to players and table."""
@@ -116,7 +129,7 @@ class Round:
             print(f"{player.name} win {self.sum_bid / len(win_players)} with {player.my_combination_str}")
             player.balance += self.sum_bid / len(win_players)
 
-    def turn(self):
+    def set_bids(self):
         """Round logic."""
         opponent_bid = 0
         end_round = True
@@ -124,6 +137,7 @@ class Round:
             end_round = False
             for player in self.players:
                 if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
+                    self.send_state_to_all(player)
                     player.turn(opponent_bid)
                     opponent_bid = max(opponent_bid, player.bid)
                     end_round = end_round or player.raise_bid
@@ -135,31 +149,86 @@ class Round:
 
     def play(self):
         """Game loop."""
-        print(self.viseble_cards, "Total bids", self.sum_bid)
-        self.turn()
-        self.viseble_cards[0], self.viseble_cards[1], self.viseble_cards[2] = \
+        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.set_bids()
+        self.visible_cards[0], self.visible_cards[1], self.visible_cards[2] = \
             self.table_cards[0], self.table_cards[1], self.table_cards[2]
-        print(self.viseble_cards, "Total bids", self.sum_bid)
-        self.turn()
-        self.viseble_cards[3] = self.table_cards[3]
-        print(self.viseble_cards, "Total bids", self.sum_bid)
-        self.turn()
-        self.viseble_cards[4] = self.table_cards[4]
-        print(self.viseble_cards, "Total bids", self.sum_bid)
-        self.turn()
+        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.set_bids()
+        self.visible_cards[3] = self.table_cards[3]
+        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.set_bids()
+        self.visible_cards[4] = self.table_cards[4]
+        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.set_bids()
         self.finish_round()
 
+    def send_state_to_all(self, cur_player):
+        """Send all game state to clients."""
+        state = {
+            "visible_cards": self.visible_cards,
+            "max_bid": self.max_bid,
+            "sum_bid": self.sum_bid,
+        }
+        players = {}
+        for player in self.players:
+            players[player.name] = {
+                "name": player.name,
+                "fold": player.fold,
+                "bid": player.bid,
+                "cards": player.cards,
+                "balance": player.balance,
+                "turn": player.name == cur_player.name
+            }
+        state["players"] = players
+        print(players)
+        for player in self.players:
+            data = json.dumps(state)+END
+            player.conn.sendall(data.encode())
 
-cur_players = []
-for name in ["Bob", "Mike", "Ann"]:
-    cur_players.append(HumanPlayer(name))
-for _ in range(2):
-    game = Round(cur_players)
-    for player in cur_players:
-        print(player.name, player.cards)
-        player.my_combination(game.table_cards)
-    print()
-    game.play()
-    for player in cur_players:
-        print(player.name, player.balance)
-    print()
+
+class Game:
+    """Main game class."""
+
+    def __init__(self, players, max_rounds):
+        self.players = players
+        self.max_rounds = max_rounds
+
+    def start(self):
+        """Start a game."""
+        cur_players = self.players
+        for _ in range(self.max_rounds):
+            game = Round(cur_players)
+            for player in cur_players:
+                print(player.name, player.cards)
+                player.my_combination(game.table_cards)
+            print()
+            game.play()
+            for player in cur_players:
+                print(player.name, player.balance)
+            print()
+        self.disconnect_all()
+
+    def disconnect_all(self):
+        """Disconnect all players at the end of the game."""
+        state = {
+            "game_is_over": True
+        }
+        for player in self.players:
+            if isinstance(player, HumanPlayer):
+                data = json.dumps(state)+END
+                player.conn.sendall(data.encode())
+                player.close()
+
+
+if __name__ == "__main__":
+    players = []
+    s = socket.create_server(("", 5000))
+    s.listen(4)
+    for name in range(2):
+        conn, addr = s.accept()
+        name = recv_end(conn, END)
+        players.append(HumanPlayer(name, conn, addr))
+    s.close()
+
+    Game(players, 1).start()
