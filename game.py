@@ -5,6 +5,7 @@ import json
 
 from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
 from combinations import count_combination
+from misc import recv_end, END
 
 
 class Player:
@@ -47,7 +48,6 @@ class HumanPlayer(Player):
 
     def __init__(self, name, conn, addr):
         super().__init__(name)
-        self.name = name
         self.conn = conn
         self.addr = addr
 
@@ -64,7 +64,8 @@ class HumanPlayer(Player):
             print("CALL (it is free) or RAISE")
         print("write FOLD or CALL or RAISE [x]")
         while True:
-            command = list(map(str.upper, input().split()))
+            command = recv_end(self.conn, END)
+            command = list(map(str.upper, command.split()))
             if command[0] == "FOLD":
                 self.fold = True
                 self.raise_bid = False
@@ -169,17 +170,18 @@ class Round:
             "max_bid": self.max_bid,
             "sum_bid": self.sum_bid,
         }
-        players = []
+        players = {}
         for player in self.players:
-            players.append({
+            players[player.name] = {
                 "name": player.name,
                 "fold": player.fold,
                 "bid": player.bid,
                 "cards": player.cards,
                 "balance": player.balance,
                 "turn": player.name == cur_player.name
-            })
+            }
         state["players"] = players
+        print(players)
         for player in self.players:
             data = json.dumps(state)+END
             player.conn.sendall(data.encode())
@@ -205,17 +207,28 @@ class Game:
             for player in cur_players:
                 print(player.name, player.balance)
             print()
+        self.disconnect_all()
 
+    def disconnect_all(self):
+        """Disconnect all players at the end of the game."""
+        state = {
+            "game_is_over": True
+        }
+        for player in self.players:
+            if isinstance(player, HumanPlayer):
+                data = json.dumps(state)+END
+                player.conn.sendall(data.encode())
+                player.close()
 
-END = "@@@END@@@"
 
 if __name__ == "__main__":
     players = []
     s = socket.create_server(("", 5000))
     s.listen(4)
-    for name in ["Bob", "Mike", "Ann"]:
+    for name in range(2):
         conn, addr = s.accept()
+        name = recv_end(conn, END)
         players.append(HumanPlayer(name, conn, addr))
-
-    Game(players, 2).start()
     s.close()
+
+    Game(players, 1).start()

@@ -1,6 +1,9 @@
 """Misc contains help functions."""
 
 
+END = "@@@END@@@"
+
+
 def recv_end(conn, end):
     """Recieve with END token."""
     total_data = []
