@@ -15,7 +15,7 @@ def count_combination(cards):
     pair, second_pair, three_of_a_kind, straight, flush, four_of_a_kind = [None] * 6
 
     if all(ranks_count[AMOUNT_RANKS - 1: AMOUNT_RANKS] + ranks_count[:4]):
-        straight = -1 + 5 - 1
+        straight = 3
     high_cards = []
     for i in range(AMOUNT_RANKS):
         if ranks_count[i] == 1:
@@ -25,6 +25,8 @@ def count_combination(cards):
                 second_pair = pair
             pair = i
         elif ranks_count[i] == 3:
+            if three_of_a_kind is not None:
+                pair = three_of_a_kind
             three_of_a_kind = i
         elif ranks_count[i] == 4:
             four_of_a_kind = i
@@ -70,5 +72,9 @@ print(count_combination(test_cards))
 test_cards = ((8, 2), (8, 3), (0, 1), (3, 1), (2, 2), (0, 0), (1, 1))
 print(count_combination(test_cards))
 test_cards = ((11, 3), (1, 0), (2, 1), (12, 1), (6, 1), (9, 1), (0, 1))
+test_cards = ((11, 3), (11, 0), (11, 1), (12, 1), (12, 2), (12, 3), (0, 3))
+print(count_combination(test_cards))
+test_cards = ((0, 3), (1, 0), (2, 1), (3, 1), (1, 1), (8, 1), (12, 1))
 print(count_combination(test_cards))
 '''
+
