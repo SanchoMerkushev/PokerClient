@@ -89,10 +89,14 @@ class HumanPlayer(Player):
                 break
             elif command[0] == "RAISE" and len(command) > 1:
                 amount = int(command[1])
-                self.balance -= opponent_bid - self.bid + amount
-                self.bid = opponent_bid + amount
-                self.raise_bid = True
-                break
+                if amount <= self.balance:
+                    self.balance -= opponent_bid - self.bid + amount
+                    self.bid = opponent_bid + amount
+                    self.raise_bid = True
+                    break
+                else:
+                    inf = "Not enough money, your maximum raise is {}".format(self.balance - opponent_bid + self.bid)
+                    send_inf_to_player(self, "output_inf", inf, answer=True)
             else:
                 inf = "Wrong command try FOLD or CALL or RAISE [N]"
                 send_inf_to_player(self, "output_inf", inf, answer=True)
