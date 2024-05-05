@@ -10,8 +10,8 @@ from misc import recv_end, END
 
 
 def send_inf_to_player(player, key, inf, answer=False):
-    sleep(0.1)
     """Send data to player."""
+    sleep(0.1)
     state = {key: inf}
     if answer:
         state["answer"] = True
@@ -225,9 +225,7 @@ class Game:
         for _ in range(self.max_rounds):
             game = Round(cur_players)
             for player in cur_players:
-                print(player.name, player.cards)
                 player.my_combination(game.table_cards)
-            print()
             game.play()
             for player in cur_players:
                 print(player.name, player.balance)
