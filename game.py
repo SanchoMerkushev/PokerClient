@@ -1,4 +1,5 @@
 """Main game mechanics module."""
+from time import sleep
 from random import sample
 import socket
 import json
@@ -6,6 +7,16 @@ import json
 from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
 from combinations import count_combination
 from misc import recv_end, END
+
+
+def send_inf_to_player(player, key, inf, answer=False):
+    sleep(0.1)
+    """Send data to player."""
+    state = {key: inf}
+    if answer:
+        state["answer"] = True
+    data = json.dumps(state)+END
+    player.conn.sendall(data.encode())
 
 
 class Player:
@@ -57,12 +68,13 @@ class HumanPlayer(Player):
 
     def turn(self, opponent_bid):
         """Fold or call or raise."""
-        print(f"{self.name} your bid {self.bid} opponent bid is {opponent_bid}")
+        inf = "{} your bid {} opponent bid is {}\n".format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
-            print(f"CALL costs {opponent_bid - self.bid} or RAISE smth over opponent bid or FOLD")
+            inf += "CALL costs {} or RAISE smth over opponent bid or FOLD\n".format(opponent_bid - self.bid)
         else:
-            print("CALL (it is free) or RAISE")
-        print("write FOLD or CALL or RAISE [x]")
+            inf += "CALL (it is free) or RAISE\n"
+        inf += "Write FOLD or CALL or RAISE [N]\n"
+        send_inf_to_player(self, "output_inf", inf, answer=True)
         while True:
             command = recv_end(self.conn, END)
             command = list(map(str.upper, command.split()))
@@ -75,14 +87,15 @@ class HumanPlayer(Player):
                 self.bid = opponent_bid
                 self.raise_bid = False
                 break
-            elif command[0] == "RAISE":
+            elif command[0] == "RAISE" and len(command) > 1:
                 amount = int(command[1])
                 self.balance -= opponent_bid - self.bid + amount
                 self.bid = opponent_bid + amount
                 self.raise_bid = True
                 break
             else:
-                print("wrong command try FOLD or CALL or RAISE")
+                inf = "Wrong command try FOLD or CALL or RAISE [N]"
+                send_inf_to_player(self, "output_inf", inf, answer=True)
 
 
 class ComputerPlayer(Player):
@@ -101,7 +114,7 @@ class Round:
         self.table_cards = None
         self.dealing_cards()
         self.max_bid = 0
-        self.sum_bid = 0
+        self.sum_bids = 0
         self.visible_cards = ["XX"] * 5
 
     def dealing_cards(self):
@@ -112,6 +125,8 @@ class Round:
         for i in range(len(self.players)):
             self.players[i].cards = [cards[CARDS_ON_TABLE + i * CARDS_ON_HAND],
                                      cards[CARDS_ON_TABLE + i * CARDS_ON_HAND + 1]]
+            send_inf_to_player(players[i], "cards_on_hand", self.players[i].cards)
+            send_inf_to_player(players[i], "balance", players[i].balance)
 
     def finish_round(self):
         """Check wining conditions at last round."""
@@ -126,8 +141,9 @@ class Round:
                 win_players.append(player)
             win_combination = max(win_combination, player.my_combination(self.table_cards))
         for player in win_players:
-            print(f"{player.name} win {self.sum_bid / len(win_players)} with {player.my_combination_str}")
-            player.balance += self.sum_bid / len(win_players)
+            inf = "{} win {} with {}".format(player.name, self.sum_bids / len(win_players), player.my_combination_str)
+            send_inf_to_player(player, "output_inf", inf)
+            player.balance += self.sum_bids / len(win_players)
 
     def set_bids(self):
         """Round logic."""
@@ -137,38 +153,42 @@ class Round:
             end_round = False
             for player in self.players:
                 if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
-                    self.send_state_to_all(player)
                     player.turn(opponent_bid)
                     opponent_bid = max(opponent_bid, player.bid)
                     end_round = end_round or player.raise_bid
                 player.first_bid_of_round = False
         for player in self.players:
             player.first_bid_of_round = True
-            self.sum_bid += player.bid
+            self.sum_bids += player.bid
             player.bid = 0
+
+    def open_cards(self, amount_visible_cards):
+        """Open common cards."""
+        for i in range(amount_visible_cards):
+            self.visible_cards[i] = self.table_cards[i]
+        for player in self.players:
+            send_inf_to_player(player, "common_cards", self.visible_cards)
+            send_inf_to_player(player, "total_bids", self.sum_bids)
 
     def play(self):
         """Game loop."""
-        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.open_cards(0)
         self.set_bids()
-        self.visible_cards[0], self.visible_cards[1], self.visible_cards[2] = \
-            self.table_cards[0], self.table_cards[1], self.table_cards[2]
-        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.open_cards(3)
         self.set_bids()
-        self.visible_cards[3] = self.table_cards[3]
-        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.open_cards(4)
         self.set_bids()
-        self.visible_cards[4] = self.table_cards[4]
-        print(self.visible_cards, "Total bids", self.sum_bid)
+        self.open_cards(5)
         self.set_bids()
         self.finish_round()
 
+    '''
     def send_state_to_all(self, cur_player):
         """Send all game state to clients."""
         state = {
             "visible_cards": self.visible_cards,
             "max_bid": self.max_bid,
-            "sum_bid": self.sum_bid,
+            "sum_bids": self.sum_bids,
         }
         players = {}
         for player in self.players:
@@ -183,8 +203,9 @@ class Round:
         state["players"] = players
         print(players)
         for player in self.players:
-            data = json.dumps(state)+END
+            data = json.dumps(state) + END
             player.conn.sendall(data.encode())
+    '''
 
 
 class Game:
@@ -211,14 +232,9 @@ class Game:
 
     def disconnect_all(self):
         """Disconnect all players at the end of the game."""
-        state = {
-            "game_is_over": True
-        }
         for player in self.players:
             if isinstance(player, HumanPlayer):
-                data = json.dumps(state)+END
-                player.conn.sendall(data.encode())
-                player.close()
+                send_inf_to_player(player, "game_over", True)
 
 
 if __name__ == "__main__":
@@ -231,4 +247,4 @@ if __name__ == "__main__":
         players.append(HumanPlayer(name, conn, addr))
     s.close()
 
-    Game(players, 1).start()
+    Game(players, 2).start()
