@@ -2,6 +2,7 @@
 import socket
 import json
 import argparse
+import cmd
 from time import sleep
 
 from misc import recv_end, END
@@ -19,13 +20,16 @@ def print_cards(cards):
     print()
 
 
-class Client:
+class Client(cmd.Cmd):
     """Client implementation."""
 
     def __init__(self, name, host, port):
+        super().__init__()
         self.s = socket.create_connection((host, port))
         self.name = name
         self.s.sendall(f"{name}{END}".encode())
+        self.my_turn = False
+        self.play()
 
     def play(self):
         """Communicate with server, main loop for client."""
@@ -33,7 +37,7 @@ class Client:
             self.game_state = json.loads(recv_end(self.s, END))
             if "game_is_over" in self.game_state:
                 self.s.close()
-                break
+                exit()
             if "cards_on_hand" in self.game_state:
                 output_string = "Your cards is"
                 print(output_string)
@@ -53,8 +57,46 @@ class Client:
                 print(output_string)
             sleep(0.1)
             if "answer" in self.game_state and self.game_state["answer"]:
-                command = input() + END
-                self.s.sendall(command.encode())
+                self.my_turn = True
+                break
+
+    def do_raise(self, arg):
+        """Raise bet."""
+        if not self.my_turn:
+            print("It's not your turn.")
+        try:
+            arg = int(arg)
+            if arg < 1:
+                raise ValueError
+        except ValueError:
+            print("RAISE value must be integer bigger than one.")
+            return
+        command = f"RAISE {arg}{END}"
+        self.s.sendall(command.encode())
+        self.play()
+
+    def do_call(self, arg):
+        """Call bet."""
+        if not self.my_turn:
+            print("It's not your turn.")
+        if arg != "":
+            print(arg)
+            print("CALL doesn't need any arguments.")
+            return
+        command = f"CALL{END}"
+        self.s.sendall(command.encode())
+        self.play()
+
+    def do_fold(self, arg):
+        """Fold cards."""
+        if not self.my_turn:
+            print("It's not your turn.")
+        if arg != "":
+            print("FOLD doesn't need any arguments.")
+            return
+        command = f"FOLD{END}"
+        self.s.sendall(command.encode())
+        self.play()
 
 
 if __name__ == '__main__':
@@ -62,4 +104,4 @@ if __name__ == '__main__':
     parser.add_argument("-n", dest="name", type=str, required=True)
     args: argparse.Namespace = parser.parse_args()
 
-    client = Client(args.name, 'localhost', 5000).play()
+    client = Client(args.name, 'localhost', 5000).cmdloop()
