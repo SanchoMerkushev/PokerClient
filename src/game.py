@@ -3,10 +3,14 @@ from time import sleep
 from random import sample
 import socket
 import json
+import gettext
 
 from src.constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
 from src.combinations import count_combination
 from src.misc import recv_end, END
+
+translation = gettext.translation("msg", "po", fallback=True)
+_ = translation.gettext
 
 
 def send_inf_to_player(player, key, inf, answer=False):
@@ -74,7 +78,7 @@ class Player:
         combination_str = COMBINATIONS[self.my_combination_tuple[0]]
         combination_str += " " + str(self.my_combination_tuple[1])
         if self.my_combination_tuple[2] is not None:
-            combination_str += " with another cards" + str(self.my_combination_tuple[2])
+            combination_str += _(" with another cards") + str(self.my_combination_tuple[2])
         self.my_combination_str = combination_str
 
 
@@ -92,12 +96,12 @@ class HumanPlayer(Player):
 
     def turn(self, opponent_bid):
         """Fold or call or raise."""
-        inf = "{} your bid {} opponent bid is {}\n".format(self.name, self.bid, opponent_bid)
+        inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
-            inf += "CALL costs {} or RAISE smth over opponent bid or FOLD\n".format(opponent_bid - self.bid)
+            inf += _("CALL costs {} or RAISE smth over opponent bid or FOLD\n").format(opponent_bid - self.bid)
         else:
-            inf += "CALL (it is free) or RAISE\n"
-        inf += "Write FOLD or CALL or RAISE [N]"
+            inf += _("CALL (it is free) or RAISE\n")
+        inf += _("Write FOLD or CALL or RAISE [N]")
         send_inf_to_player(self, "output_inf", inf, answer=True)
         while True:
             command = recv_end(self.conn, END)
@@ -119,10 +123,10 @@ class HumanPlayer(Player):
                     self.raise_bid = True
                     break
                 else:
-                    inf = "Not enough money, your maximum raise is {}".format(self.balance - opponent_bid + self.bid)
+                    inf = _("Not enough money, your maximum raise is {}").format(self.balance - opponent_bid + self.bid)
                     send_inf_to_player(self, "output_inf", inf, answer=True)
             else:
-                inf = "Wrong command try FOLD or CALL or RAISE [N]"
+                inf = _("Wrong command try FOLD or CALL or RAISE [N]")
                 send_inf_to_player(self, "output_inf", inf, answer=True)
 
 
@@ -168,7 +172,7 @@ class Round:
             win_combination = max(win_combination, player.my_combination(self.table_cards))
         for player in win_players:
             player.balance += self.sum_bids / len(win_players)
-        inf = "Winner - {} win {} with {}".format(player.name, self.sum_bids / len(win_players), player.my_combination_str)
+        inf = _("Winner - {} win {} with {}").format(player.name, self.sum_bids / len(win_players), player.my_combination_str)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
         sleep(4)

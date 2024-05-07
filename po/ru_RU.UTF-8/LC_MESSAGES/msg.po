@@ -1,0 +1,97 @@
+# Russian (Russia) translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-07 13:45+0300\n"
+"PO-Revision-Date: 2024-05-07 13:52+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru_RU\n"
+"Language-Team: ru_RU <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: client.py:35
+msgid "Players: \t"
+msgstr "Игроки: \t"
+
+#: client.py:36
+msgid "Balances:\t"
+msgstr "Баланс:\t"
+
+#: client.py:37
+msgid "Cards:   \t"
+msgstr "Карты:   \t"
+
+#: client.py:38
+msgid "Bids:    \t"
+msgstr "Ставки:    \t"
+
+#: client.py:39
+msgid "Turns:   \t"
+msgstr "Ход:   \t"
+
+#: client.py:53
+msgid "Bank: {}"
+msgstr "Сумма ставок: {}"
+
+#: client.py:99 client.py:115 client.py:128
+msgid "It's not your turn."
+msgstr "Сейчас не твой ход."
+
+#: client.py:105
+msgid "RAISE value must be integer bigger than one."
+msgstr "RAISE значение должно быть целым и больше или равно единицы."
+
+#: client.py:118
+msgid "CALL doesn't need any arguments."
+msgstr "CALL не требует аргументов."
+
+#: client.py:130
+msgid "FOLD doesn't need any arguments."
+msgstr "FOLD не требует аргументов."
+
+#: client.py:139
+msgid "Unknown command:"
+msgstr "Неизвестная команда"
+
+#: game.py:81
+msgid " with another cards"
+msgstr " с остальными картами"
+
+#: game.py:99
+msgid "{} your bid {} opponent bid is {}\n"
+msgstr "{} твоя ставка {} ставка оппонента {}\n"
+
+#: game.py:101
+msgid "CALL costs {} or RAISE smth over opponent bid or FOLD\n"
+msgstr "CALL стоит {} или RAISE сверх ставки оппонента или FOLD\n"
+
+#: game.py:103
+msgid "CALL (it is free) or RAISE\n"
+msgstr "CALL (это бесплатно) или RAISE\n"
+
+#: game.py:104
+msgid "Write FOLD or CALL or RAISE [N]"
+msgstr "Введи FOLD или CALL или RAISE [N]"
+
+#: game.py:126
+msgid "Not enough money, your maximum raise is {}"
+msgstr "Недостаточно денег, максимальное повышение ставки {}"
+
+#: game.py:129
+msgid "Wrong command try FOLD or CALL or RAISE [N]"
+msgstr "Неправильная команда, напиши FOLD или CALL или RAISE [N]"
+
+#: game.py:175
+msgid "Winner - {} win {} with {}"
+msgstr "Победитель - {} выиграл {} с комбинацией {}"
+

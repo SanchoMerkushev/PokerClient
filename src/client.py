@@ -4,9 +4,14 @@ import json
 import argparse
 import cmd
 import os
+import gettext
 from time import sleep
 
 from src.misc import recv_end, END
+
+
+translation = gettext.translation("msg", "po", fallback=True)
+_ = translation.gettext
 
 
 def cards_to_str(cards):
@@ -27,11 +32,11 @@ class UI():
 
     def print_state(self, state, my_name, my_cards):
         """Print all game info."""
-        players_names = "Players: \t"
-        players_balances = "Balances:\t"
-        players_cards = "Cards:   \t"
-        players_bids = "Bids:    \t"
-        players_turns = "Turns:   \t"
+        players_names = _("Players: \t")
+        players_balances = _("Balances:\t")
+        players_cards = _("Cards:   \t")
+        players_bids = _("Bids:    \t")
+        players_turns = _("Turns:   \t")
         for name in state["players"].keys():
             players_names += name + "\t"
             players_balances += str(state["players"][name]["balance"]) + "\t"
@@ -45,7 +50,7 @@ class UI():
             else:
                 players_turns += " " + "\t"
         center = "\t"*((len(state["players"])*2 - 1)//2 - 1)
-        bank = center + f"Bank: {state['sum_bids']}"
+        bank = center + _("Bank: {}").format(state['sum_bids'])
         cards = center + cards_to_str(state["visible_cards"])
         os.system("clear")
         ui = f"{players_names}\n{players_balances}\n{players_cards}\n{players_bids}\n{players_turns}\n\n{bank}\n{cards}"
@@ -91,13 +96,13 @@ class Client(cmd.Cmd):
     def do_RAISE(self, arg):
         """Raise bid."""
         if not self.my_turn:
-            print("It's not your turn.")
+            print(_("It's not your turn."))
         try:
             arg = int(arg)
             if arg < 1:
                 raise ValueError
         except ValueError:
-            print("RAISE value must be integer bigger than one.")
+            print(_("RAISE value must be integer bigger than one."))
             return
         command = f"RAISE {arg}{END}"
         self.s.sendall(command.encode())
@@ -107,10 +112,10 @@ class Client(cmd.Cmd):
     def do_CALL(self, arg):
         """Call bid."""
         if not self.my_turn:
-            print("It's not your turn.")
+            print(_("It's not your turn."))
         if arg != "":
             print(arg)
-            print("CALL doesn't need any arguments.")
+            print(_("CALL doesn't need any arguments."))
             return
         command = f"CALL{END}"
         self.s.sendall(command.encode())
@@ -120,9 +125,9 @@ class Client(cmd.Cmd):
     def do_FOLD(self, arg):
         """Fold cards."""
         if not self.my_turn:
-            print("It's not your turn.")
+            print(_("It's not your turn."))
         if arg != "":
-            print("FOLD doesn't need any arguments.")
+            print(_("FOLD doesn't need any arguments."))
             return
         command = f"FOLD{END}"
         self.s.sendall(command.encode())
@@ -131,7 +136,7 @@ class Client(cmd.Cmd):
 
     def default(self, arg):
         """Print error."""
-        print("Unknown command:", arg)
+        print(_("Unknown command:"), arg)
 
 
 if __name__ == '__main__':
