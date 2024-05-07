@@ -22,7 +22,6 @@ def cards_to_str(cards):
     return "  ".join(res)
 
 
-
 class UI():
     """Class for printing game information."""
 
@@ -82,11 +81,14 @@ class Client(cmd.Cmd):
                 output_string = self.game_state["output_inf"]
                 print(output_string)
                 sleep(0.2)
+            if "finish_round" in self.game_state:
+                output_string = self.game_state["finish_round"]
+                print(output_string)
             if "answer" in self.game_state and self.game_state["answer"]:
                 self.my_turn = True
                 break
 
-    def do_raise(self, arg):
+    def do_RAISE(self, arg):
         """Raise bid."""
         if not self.my_turn:
             print("It's not your turn.")
@@ -102,7 +104,7 @@ class Client(cmd.Cmd):
         self.my_turn = False
         self.play()
 
-    def do_call(self, arg):
+    def do_CALL(self, arg):
         """Call bid."""
         if not self.my_turn:
             print("It's not your turn.")
@@ -115,7 +117,7 @@ class Client(cmd.Cmd):
         self.my_turn = False
         self.play()
 
-    def do_fold(self, arg):
+    def do_FOLD(self, arg):
         """Fold cards."""
         if not self.my_turn:
             print("It's not your turn.")
