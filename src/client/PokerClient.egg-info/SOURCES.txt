@@ -1,0 +1,9 @@
+pyproject.toml
+./__init__.py
+./__main__.py
+./client.py
+./misc.py
+PokerClient.egg-info/PKG-INFO
+PokerClient.egg-info/SOURCES.txt
+PokerClient.egg-info/dependency_links.txt
+PokerClient.egg-info/top_level.txt

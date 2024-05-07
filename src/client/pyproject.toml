@@ -15,6 +15,9 @@ classifiers = [
 ]
 dynamic = ["dependencies"]
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.dynamic]
 dependencies = { file = "requirements.txt" }
 
@@ -23,4 +26,4 @@ requires = ["Sphinx", "build", "coverage", "doit", "flake8", "flake8-docstrings"
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-dir]
-PokerClient = "client"
+PokerClient = "."

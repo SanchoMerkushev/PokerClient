@@ -6,7 +6,7 @@ import os
 import gettext
 from time import sleep
 
-from misc import recv_end, END
+from .misc import recv_end, END
 
 
 translation = gettext.translation("msg", "po", fallback=True)

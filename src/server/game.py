@@ -5,9 +5,9 @@ import socket
 import json
 import gettext
 
-from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
-from combinations import count_combination
-from misc import recv_end, END
+from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
+from .combinations import count_combination
+from .misc import recv_end, END
 
 translation = gettext.translation("msg", "po", fallback=True)
 _ = translation.gettext

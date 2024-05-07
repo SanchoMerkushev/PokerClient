@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: PokerClient
+Version: 0.1
+Summary: Play poker in terminal
+Author-email: SanchoMerkushev <sashamerkushev@yandex.ru>, iemttt <s02190454@gse.cs.msu.ru>
+Keywords: Poket,terminal
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
