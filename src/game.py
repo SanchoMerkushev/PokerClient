@@ -4,9 +4,9 @@ from random import sample
 import socket
 import json
 
-from src.constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
-from src.combinations import count_combination
-from src.misc import recv_end, END
+from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
+from combinations import count_combination
+from misc import recv_end, END
 
 
 def send_inf_to_player(player, key, inf, answer=False):
