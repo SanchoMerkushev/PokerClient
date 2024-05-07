@@ -6,7 +6,7 @@ from constants import CARDS_ON_TABLE, CARDS_ON_HAND
 
 
 class TestRoundDealingCards(unittest.TestCase):
-    """Class to test turn of class Round."""
+    """Class to test dealing_cards of class Round."""
 
     def setUp(self):
         """Set up for testing."""

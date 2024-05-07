@@ -16,6 +16,8 @@ _ = translation.gettext
 def send_inf_to_player(player, key, inf, answer=False):
     """Send data to player."""
     sleep(0.1)
+    if not hasattr(player, "conn"):
+        return
     state = {key: inf}
     if answer:
         state["answer"] = True
@@ -159,7 +161,7 @@ class Round:
         for i in range(len(self.players)):
             self.players[i].cards = [cards[CARDS_ON_TABLE + i * CARDS_ON_HAND],
                                      cards[CARDS_ON_TABLE + i * CARDS_ON_HAND + 1]]
-            send_inf_to_player(players[i], "cards_on_hand", self.players[i].cards)
+            send_inf_to_player(self.players[i], "cards_on_hand", self.players[i].cards)
 
     def finish_round(self):
         """Check wining conditions at last round."""
