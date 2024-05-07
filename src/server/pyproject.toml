@@ -2,7 +2,6 @@
 name = "PokerServer"
 version = "0.1"
 description = "Play poker in terminal"
-readme = "README.md"
 requires-python = ">=3.10"
 authors = [
  {name = "SanchoMerkushev", email = "sashamerkushev@yandex.ru"},

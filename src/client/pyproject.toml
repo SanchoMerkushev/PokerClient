@@ -2,7 +2,6 @@
 name = "PokerClient"
 version = "0.1"
 description = "Play poker in terminal"
-readme = "README.md"
 requires-python = ">=3.10"
 authors = [
  {name = "SanchoMerkushev", email = "sashamerkushev@yandex.ru"},
@@ -22,7 +21,7 @@ include-package-data = true
 dependencies = { file = "requirements.txt" }
 
 [build-system]
-requires = ["Sphinx", "build", "coverage", "doit", "flake8", "flake8-docstrings", "setuptools"]
+requires = ["Sphinx", "build", "doit", "flake8", "flake8-docstrings", "setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-dir]
