@@ -1,13 +1,12 @@
 """Client implementation."""
 import socket
 import json
-import argparse
 import cmd
 import os
 import gettext
 from time import sleep
 
-from misc import recv_end, END
+from .misc import recv_end, END
 
 
 translation = gettext.translation("msg", "po", fallback=True)
@@ -137,11 +136,3 @@ class Client(cmd.Cmd):
     def default(self, arg):
         """Print error."""
         print(_("Unknown command:"), arg)
-
-
-if __name__ == '__main__':
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
-    parser.add_argument("-n", dest="name", type=str, required=True)
-    args: argparse.Namespace = parser.parse_args()
-
-    client = Client(args.name, 'localhost', 5000).cmdloop()

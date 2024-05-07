@@ -1,8 +1,8 @@
 """Module for testing count combinations."""
 import unittest
 
-from combinations import count_combination
-from constants import RANKS, SUITS, COMBINATIONS
+from .combinations import count_combination
+from .constants import RANKS, SUITS, COMBINATIONS
 
 
 def cards_to_numbers(cards):
@@ -20,12 +20,12 @@ class TestCombinations(unittest.TestCase):
     def setUp(self):
         """Set up for testing."""
         self.cards1 = cards_to_numbers(("A_S", "K_S", "Q_S", "10_H", "8_D", "4_D", "2_D"))
-        self.res1 = COMBINATIONS.index("High Card"), RANKS.index("A"), [RANKS.index("K"), RANKS.index("Q"),
+        self.res1 = COMBINATIONS.index("High Card"), [RANKS.index("A")], [RANKS.index("K"), RANKS.index("Q"),
                                                                         RANKS.index("10"), RANKS.index("8")]
         self.cards2 = cards_to_numbers(("A_S", "K_S", "A_S", "9_H", "10_D", "4_D", "K_D"))
         self.res2 = COMBINATIONS.index("Two Pairs"), [RANKS.index("A"), RANKS.index("K")], [RANKS.index("10")]
         self.cards3 = cards_to_numbers(("A_S", "K_S", "Q_S", "10_H", "8_D", "J_D", "2_D"))
-        self.res3 = COMBINATIONS.index("Straight"), RANKS.index("A"), []
+        self.res3 = COMBINATIONS.index("Straight"), [RANKS.index("A")], []
         self.cards4 = cards_to_numbers(("4_S", "3_S", "Q_S", "10_S", "8_S", "K_S", "2_D"))
         self.res4 = COMBINATIONS.index("Flush"), [RANKS.index("K"), RANKS.index("Q"),
                                                   RANKS.index("10"), RANKS.index("8"), RANKS.index("4")], []
