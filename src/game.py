@@ -170,13 +170,14 @@ class Round:
             elif player.my_combination(self.table_cards) == win_combination:
                 win_players.append(player)
             win_combination = max(win_combination, player.my_combination(self.table_cards))
+        win_size = self.sum_bids / len(win_players)
         for player in win_players:
-            player.balance += self.sum_bids / len(win_players)
-        inf = _("Winner - {} win {} with {}").format(player.name, self.sum_bids / len(win_players), player.my_combination_str)
+            player.balance += win_size
+        inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
         sleep(4)
-            
+
     def set_bids(self):
         """Round logic."""
         opponent_bid = 0

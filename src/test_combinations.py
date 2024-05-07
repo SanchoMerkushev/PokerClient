@@ -1,4 +1,4 @@
-"""Module for testing."""
+"""Module for testing count combinations."""
 import unittest
 
 from combinations import count_combination
