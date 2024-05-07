@@ -1,8 +1,8 @@
 """Module for testing create_my_combination_str from class Player."""
 import unittest
 
-from game import Player
-from constants import COMBINATIONS, RANKS
+from .game import Player
+from .constants import COMBINATIONS, RANKS
 
 
 class TestPlayerCreateMyCombinationStr(unittest.TestCase):

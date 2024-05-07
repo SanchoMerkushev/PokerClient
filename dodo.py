@@ -1,3 +1,5 @@
+"""Tasks for doit"""
+
 def task_html():
     """Return html documentation."""
     return {
@@ -22,5 +24,16 @@ def task_server_wheel():
 def task_tests():
     """Run tests."""
     return {
-        "actions": ["python -m unittest src.server.test_combinations -v"]
+        "actions": [
+            "python -m unittest src/server/test_combinations.py -v",
+            "python -m unittest src/server/test_Player_create_my_combination_str.py -v",
+            "python -m unittest src/server/test_Round_dealing_cards.py -v",
+            "python -m unittest src/server/test_Round_finish_round.py -v",
+        ]
+    }
+
+def task_int():
+    """Gen internationalization"""
+    return {
+        "action": ["pybabel compile -D msg -l ru_RU.UTF-8 -d po -i po/ru_RU.UTF-8/LC_MESSAGES/msg.po"]
     }
