@@ -1,8 +1,8 @@
 """Module for testing count combinations."""
 import unittest
 
-from combinations import count_combination
-from constants import RANKS, SUITS, COMBINATIONS
+from server.combinations import count_combination
+from server.constants import RANKS, SUITS, COMBINATIONS
 
 
 def cards_to_numbers(cards):

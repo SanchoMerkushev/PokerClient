@@ -244,16 +244,3 @@ class Game:
         for player in self.players:
             if isinstance(player, HumanPlayer):
                 send_inf_to_player(player, "game_over", True)
-
-
-if __name__ == "__main__":
-    players = []
-    s = socket.create_server(("", 5000))
-    s.listen(4)
-    for name in range(2):
-        conn, addr = s.accept()
-        name = recv_end(conn, END)
-        players.append(HumanPlayer(name, conn, addr))
-    s.close()
-
-    Game(players, 2).start()
