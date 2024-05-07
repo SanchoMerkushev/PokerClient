@@ -5,7 +5,7 @@ import socket
 import json
 import gettext
 
-from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE
+from constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
 from combinations import count_combination
 from misc import recv_end, END
 
@@ -76,9 +76,12 @@ class Player:
     def create_my_combination_str(self):
         """Make a pretty string with combinations."""
         combination_str = COMBINATIONS[self.my_combination_tuple[0]]
-        combination_str += " " + str(self.my_combination_tuple[1])
+        for rank in self.my_combination_tuple[1]:
+            combination_str += " " + RANKS[rank]
         if self.my_combination_tuple[2] is not None:
-            combination_str += _(" with another cards") + str(self.my_combination_tuple[2])
+            combination_str += _(" with another cards")
+            for rank in self.my_combination_tuple[2]:
+                combination_str += " " + RANKS[rank]
         self.my_combination_str = combination_str
 
 

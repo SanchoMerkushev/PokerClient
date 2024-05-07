@@ -37,22 +37,22 @@ def count_combination(cards):
             flush = suits_list[i][:5]
 
     if straight is not None and flush is not None and straight == AMOUNT_RANKS - 1:
-        return 9, straight, []
+        return 9, [straight], []
     elif straight is not None and flush is not None:
-        return 8, straight, []
+        return 8, [straight], []
     elif four_of_a_kind is not None:
-        return 7, four_of_a_kind, high_cards[:1]
+        return 7, [four_of_a_kind], high_cards[:1]
     elif pair is not None and three_of_a_kind is not None:
         return 6, [three_of_a_kind, pair], []
     elif flush is not None:
         return 5, flush, []
     elif straight is not None:
-        return 4, straight, []
+        return 4, [straight], []
     elif three_of_a_kind is not None:
-        return 3, three_of_a_kind, high_cards[:2]
+        return 3, [three_of_a_kind], high_cards[:2]
     elif second_pair is not None:
         return 2, [pair, second_pair], high_cards[:1]
     elif pair is not None:
-        return 1, pair, high_cards[:3]
+        return 1, [pair], high_cards[:3]
     else:
-        return 0, high_cards[0], high_cards[1:5]
+        return 0, [high_cards[0]], high_cards[1:5]
