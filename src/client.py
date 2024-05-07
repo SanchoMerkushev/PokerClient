@@ -6,7 +6,7 @@ import cmd
 import os
 from time import sleep
 
-from misc import recv_end, END
+from src.misc import recv_end, END
 
 
 def cards_to_str(cards):

@@ -1,5 +1,5 @@
 """Game combinations."""
-from constants import AMOUNT_RANKS, AMOUNT_SUITS
+from src.constants import AMOUNT_RANKS, AMOUNT_SUITS
 
 
 def count_combination(cards):
