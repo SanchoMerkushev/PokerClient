@@ -97,7 +97,7 @@ class HumanPlayer(Player):
             inf += "CALL costs {} or RAISE smth over opponent bid or FOLD\n".format(opponent_bid - self.bid)
         else:
             inf += "CALL (it is free) or RAISE\n"
-        inf += "Write FOLD or CALL or RAISE [N]\n"
+        inf += "Write FOLD or CALL or RAISE [N]"
         send_inf_to_player(self, "output_inf", inf, answer=True)
         while True:
             command = recv_end(self.conn, END)
@@ -113,7 +113,7 @@ class HumanPlayer(Player):
                 break
             elif command[0] == "RAISE" and len(command) > 1:
                 amount = int(command[1])
-                if amount <= self.balance:
+                if opponent_bid - self.bid + amount <= self.balance:
                     self.balance -= opponent_bid - self.bid + amount
                     self.bid = opponent_bid + amount
                     self.raise_bid = True

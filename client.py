@@ -22,6 +22,7 @@ def cards_to_str(cards):
     return "  ".join(res)
 
 
+
 class UI():
     """Class for printing game information."""
 

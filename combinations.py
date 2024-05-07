@@ -34,7 +34,7 @@ def count_combination(cards):
             straight = i + 5 - 1
     for i in range(AMOUNT_SUITS):
         if len(suits_list[i]) >= 5:
-            flush = suits_list[i][-5:]
+            flush = suits_list[i][:5]
 
     if straight is not None and flush is not None and straight == AMOUNT_RANKS - 1:
         return 9, straight, []
@@ -56,24 +56,3 @@ def count_combination(cards):
         return 1, pair, high_cards[:3]
     else:
         return 0, high_cards[0], high_cards[1:5]
-
-
-'''
-test_cards = ((1, 2), (5, 2), (4, 2), (7, 2), (8, 2), (6, 1), (11, 2))
-print(count_combination(test_cards))
-test_cards = ((0, 1), (0, 2), (8, 1), (8, 2), (7, 3), (4, 1), (4, 2))
-print(count_combination(test_cards))
-test_cards = ((0, 1), (0, 2), (8, 1), (8, 2), (0, 3), (4, 1), (4, 2))
-print(count_combination(test_cards))
-test_cards = ((0, 1), (1, 2), (8, 1), (8, 2), (9, 3), (4, 1), (5, 2))
-print(count_combination(test_cards))
-test_cards = ((0, 1), (1, 1), (4, 1), (8, 1), (9, 1), (6, 1), (5, 2))
-print(count_combination(test_cards))
-test_cards = ((8, 2), (8, 3), (0, 1), (3, 1), (2, 2), (0, 0), (1, 1))
-print(count_combination(test_cards))
-test_cards = ((11, 3), (1, 0), (2, 1), (12, 1), (6, 1), (9, 1), (0, 1))
-test_cards = ((11, 3), (11, 0), (11, 1), (12, 1), (12, 2), (12, 3), (0, 3))
-print(count_combination(test_cards))
-test_cards = ((0, 3), (1, 0), (2, 1), (3, 1), (1, 1), (8, 1), (12, 1))
-print(count_combination(test_cards))
-'''
