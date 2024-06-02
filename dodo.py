@@ -35,5 +35,5 @@ def task_tests():
 def task_int():
     """Gen internationalization"""
     return {
-        "action": ["pybabel compile -D msg -l ru_RU.UTF-8 -d po -i po/ru_RU.UTF-8/LC_MESSAGES/msg.po"]
+        "actions": ["pybabel compile -D msg -l ru_RU.UTF-8 -d po -i po/ru_RU.UTF-8/LC_MESSAGES/msg.po"]
     }
