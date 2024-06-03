@@ -1,0 +1,25 @@
+[project]
+name = "PokerClient"
+version = "0.1"
+description = "Play poker in terminal"
+requires-python = ">=3.10"
+authors = [
+ {name = "SanchoMerkushev", email = "sashamerkushev@yandex.ru"},
+ {name = "iemttt", email = "s02190454@gse.cs.msu.ru"}
+]
+keywords = ["poker", "terminal"]
+classifiers = ["Programming Language :: Python :: 3"]
+
+[build-system]
+requires = ["setuptools", "Sphinx", "build", "doit", "flake8", "flake8-docstrings", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+AppBase = "src"
+
+[tool.setuptools.package-data]
+AppBase = ["po/*/*/*.mo"]
+
+[project.scripts]
+PokerClient = "AppBase.client.__main__:client_main"
+PokerServer = "AppBase.server.main:server_main"

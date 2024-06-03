@@ -12,7 +12,7 @@ def task_html():
 def task_wheel():
     """Build client wheel"""
     return {
-       'actions': ['python -m build -n -w src'],
+       'actions': ['python -m build -n -w'],
     }
 
 
