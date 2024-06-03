@@ -1,8 +1,8 @@
 """Module for testing cards_to_str."""
 import unittest
 
-from ..client import cards_to_str
-from .constants import RANKS, SUITS
+from src.client import cards_to_str
+from src.server.constants import RANKS, SUITS
 
 
 class TestCardsToStr(unittest.TestCase):

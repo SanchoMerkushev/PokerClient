@@ -1,8 +1,8 @@
 """Module for testing finish_round from class Round."""
 import unittest
 
-from .game import Round, Player
-from .constants import RANKS
+from src.server.game import Round, Player
+from src.server.constants import RANKS
 
 
 class TestFinishRound(unittest.TestCase):
