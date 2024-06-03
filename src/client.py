@@ -2,6 +2,7 @@
 import socket
 import json
 import cmd
+import sys
 import os
 import gettext
 from time import sleep
@@ -11,6 +12,7 @@ from src.misc import recv_end, END
 
 translation = gettext.translation("msg", "po", fallback=True)
 _ = translation.gettext
+sys.path.insert(0, os.path.abspath('..'))
 
 
 def cards_to_str(cards):

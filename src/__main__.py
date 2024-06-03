@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Game client launcher."""
 import argparse
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath('..'))
 
 from src.client import Client
 
