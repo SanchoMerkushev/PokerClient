@@ -2,8 +2,8 @@
 """Game server launcher."""
 import socket
 
-from .game import Game, HumanPlayer
-from .misc import recv_end, END
+from src.game import Game, HumanPlayer
+from src.misc import recv_end, END
 
 
 if __name__ == "__main__":

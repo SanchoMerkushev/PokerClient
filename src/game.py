@@ -5,9 +5,9 @@ import socket
 import json
 import gettext
 
-from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
-from .combinations import count_combination
-from .misc import recv_end, END
+from src.constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
+from src.combinations import count_combination
+from src.misc import recv_end, END
 
 translation = gettext.translation("msg", "po", fallback=True)
 _ = translation.gettext
@@ -15,7 +15,7 @@ _ = translation.gettext
 
 def send_inf_to_player(player, key, inf, answer=False):
     """Send data to player."""
-    sleep(0.1)
+    sleep(0.01)
     if not hasattr(player, "conn"):
         return
     state = {key: inf}
@@ -175,13 +175,13 @@ class Round:
             elif player.my_combination(self.table_cards) == win_combination:
                 win_players.append(player)
             win_combination = max(win_combination, player.my_combination(self.table_cards))
-        win_size = self.sum_bids / len(win_players)
+        win_size = self.sum_bids // len(win_players)
         for player in win_players:
             player.balance += win_size
         inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
-        sleep(4)
+        sleep(0.01)
 
     def set_bids(self):
         """Round logic."""
