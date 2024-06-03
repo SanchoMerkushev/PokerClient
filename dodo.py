@@ -9,17 +9,12 @@ def task_html():
         ]
     }
 
-def task_client_wheel():
+def task_wheel():
     """Build client wheel"""
     return {
-       'actions': ['python -m build -n -w src/client'],
+       'actions': ['python -m build -n -w src'],
     }
 
-def task_server_wheel():
-    """Build server wheel"""
-    return {
-       'actions': ['python -m build -n -w src/server'],
-    }
 
 def task_tests():
     """Run tests."""
