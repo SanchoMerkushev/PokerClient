@@ -20,10 +20,7 @@ def task_tests():
     """Run tests."""
     return {
         "actions": [
-            "python -m unittest tests/test_combinations.py -v",
-            "python -m unittest tests/test_Player_create_my_combination_str.py -v",
-            "python -m unittest tests/test_Round_dealing_cards.py -v",
-            "python -m unittest tests/test_Round_finish_round.py -v",
+            "python -m unittest tests/test_* -v",
         ]
     }
 
