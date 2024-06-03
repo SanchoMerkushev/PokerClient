@@ -15,6 +15,21 @@ def task_wheel():
        'actions': ['python -m build -n -w'],
     }
 
+def task_client():
+    """Run client"""
+    return {
+        'actions': ['python -m src.client -n %(name)s'],
+        'params': [{'name': 'name',
+                    'short': 'n',
+                    'default': '',
+                    'help': "Choose name for PokerClient"}]
+    }
+
+def task_server():
+    """Run server"""
+    return {
+        'actions': ['python -m src.server']
+    }
 
 def task_tests():
     """Run tests."""

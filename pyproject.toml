@@ -22,4 +22,4 @@ AppBase = ["po/*/*/*.mo"]
 
 [project.scripts]
 PokerClient = "AppBase.client.__main__:client_main"
-PokerServer = "AppBase.server.main:server_main"
+PokerServer = "AppBase.server.__main__:server_main"
