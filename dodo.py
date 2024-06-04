@@ -12,24 +12,23 @@ def task_html():
 def task_client_wheel():
     """Build client wheel"""
     return {
-       'actions': ['python -m build -n -w src'],
+       'actions': ['python -m build -n -w src/client'],
     }
 
 def task_server_wheel():
     """Build server wheel"""
     return {
-       'actions': ['python -m build -n -w src'],
+       'actions': ['python -m build -n -w src/server'],
     }
 
 def task_tests():
     """Run tests."""
     return {
         "actions": [
-            "python -m unittest tests/test_combinations.py -v",
-            "python -m unittest tests/test_cards_to_str.py -v",
-            "python -m unittest tests/test_Round_finish_round.py -v",
-            "python -m unittest tests/test_Round_dealing_cards.py -v",
-            "python -m unittest tests/test_Round_divide_win_balance.py -v",
+            "python -m unittest src/server/test_combinations.py -v",
+            "python -m unittest src/server/test_Player_create_my_combination_str.py -v",
+            "python -m unittest src/server/test_Round_dealing_cards.py -v",
+            "python -m unittest src/server/test_Round_finish_round.py -v",
         ]
     }
 

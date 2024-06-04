@@ -2,7 +2,7 @@
 """Game client launcher."""
 import argparse
 
-from src.client import Client
+from .client import Client
 
 
 if __name__ == "__main__":

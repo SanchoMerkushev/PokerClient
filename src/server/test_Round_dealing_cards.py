@@ -1,8 +1,8 @@
 """Module for testing dealing_cards from class Round."""
 import unittest
 
-from src.game import Round, Player
-from src.constants import CARDS_ON_TABLE, CARDS_ON_HAND
+from .game import Round, Player
+from .constants import CARDS_ON_TABLE, CARDS_ON_HAND
 
 
 class TestRoundDealingCards(unittest.TestCase):
