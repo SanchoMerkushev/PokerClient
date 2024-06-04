@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """Game server launcher."""
 import socket
-import sys
-import os
-
-sys.path.insert(0, os.path.abspath('..'))
 
 from src.game import Game, HumanPlayer
 from src.misc import recv_end, END

@@ -4,10 +4,6 @@ from random import sample
 import socket
 import json
 import gettext
-import sys
-import os
-
-sys.path.insert(0, os.path.abspath('..'))
 
 from src.constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
 from src.combinations import count_combination
