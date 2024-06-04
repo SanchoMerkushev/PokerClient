@@ -84,7 +84,7 @@ class Client(cmd.Cmd):
             if "output_inf" in self.game_state:
                 output_string = self.game_state["output_inf"]
                 print(output_string)
-                sleep(0.2)
+                sleep(0.01)
             if "finish_round" in self.game_state:
                 output_string = self.game_state["finish_round"]
                 print(output_string)

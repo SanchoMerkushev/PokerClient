@@ -15,7 +15,7 @@ _ = translation.gettext
 
 def send_inf_to_player(player, key, inf, answer=False):
     """Send data to player."""
-    sleep(0.1)
+    sleep(0.01)
     if not hasattr(player, "conn"):
         return
     state = {key: inf}
@@ -181,7 +181,7 @@ class Round:
         inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
-        sleep(4)
+        sleep(0.01)
 
     def set_bids(self):
         """Round logic."""
