@@ -9,7 +9,10 @@ Welcome to PokerClient's documentation!
 .. toctree::
    :maxdepth: 3
    :caption: Contents:
-   
+
+   modules
+   client
+   server
 
 This application allows to play Texas Holdem in terminal.
 It's a client-server application.
