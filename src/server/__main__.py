@@ -6,7 +6,7 @@ from .game import Game, HumanPlayer
 from .misc import recv_end, END
 
 
-if __name__ == "__main__":
+def server_main():
     players = []
     s = socket.create_server(("", 5000))
     s.listen(4)
@@ -17,3 +17,7 @@ if __name__ == "__main__":
     s.close()
 
     Game(players, 2).start()
+
+
+if __name__ == "__main__":
+    server_main()

@@ -9,26 +9,33 @@ def task_html():
         ]
     }
 
-def task_client_wheel():
+def task_wheel():
     """Build client wheel"""
     return {
-       'actions': ['python -m build -n -w src/client'],
+       'actions': ['python -m build -n -w'],
     }
 
-def task_server_wheel():
-    """Build server wheel"""
+def task_client():
+    """Run client"""
     return {
-       'actions': ['python -m build -n -w src/server'],
+        'actions': ['python -m src.client -n %(name)s'],
+        'params': [{'name': 'name',
+                    'short': 'n',
+                    'default': '',
+                    'help': "Choose name for PokerClient"}]
+    }
+
+def task_server():
+    """Run server"""
+    return {
+        'actions': ['python -m src.server']
     }
 
 def task_tests():
     """Run tests."""
     return {
         "actions": [
-            "python -m unittest src/server/test_combinations.py -v",
-            "python -m unittest src/server/test_Player_create_my_combination_str.py -v",
-            "python -m unittest src/server/test_Round_dealing_cards.py -v",
-            "python -m unittest src/server/test_Round_finish_round.py -v",
+            "python -m unittest tests/test_* -v",
         ]
     }
 
