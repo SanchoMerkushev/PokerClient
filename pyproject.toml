@@ -15,11 +15,10 @@ requires = ["setuptools", "Sphinx", "build", "doit", "flake8", "flake8-docstring
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-dir]
-AppBase = "src"
-
+src = "src"
 [tool.setuptools.package-data]
-AppBase = ["po/*/*/*.mo"]
+src = ["po/*/*/*.mo"]
 
 [project.scripts]
-PokerClient = "AppBase.client.__main__:client_main"
-PokerServer = "AppBase.server.__main__:server_main"
+PokerClient = "src.client.__main__:client_main"
+PokerServer = "src.server.__main__:server_main"
