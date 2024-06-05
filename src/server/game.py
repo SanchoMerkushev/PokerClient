@@ -1,7 +1,6 @@
 """Main game mechanics module."""
 from time import sleep
 from random import sample
-import socket
 import json
 import gettext
 

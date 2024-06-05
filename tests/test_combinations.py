@@ -21,7 +21,7 @@ class TestCombinations(unittest.TestCase):
         """Set up for testing."""
         self.cards1 = cards_to_numbers(("A_S", "K_S", "Q_S", "10_H", "8_D", "4_D", "2_D"))
         self.res1 = COMBINATIONS.index("High Card"), [RANKS.index("A")], [RANKS.index("K"), RANKS.index("Q"),
-                                                                        RANKS.index("10"), RANKS.index("8")]
+                                                                          RANKS.index("10"), RANKS.index("8")]
         self.cards2 = cards_to_numbers(("A_S", "K_S", "A_S", "9_H", "10_D", "4_D", "K_D"))
         self.res2 = COMBINATIONS.index("Two Pairs"), [RANKS.index("A"), RANKS.index("K")], [RANKS.index("10")]
         self.cards3 = cards_to_numbers(("A_S", "K_S", "Q_S", "10_H", "8_D", "J_D", "2_D"))

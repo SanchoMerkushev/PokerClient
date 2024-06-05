@@ -7,6 +7,7 @@ from .misc import recv_end, END
 
 
 def server_main():
+    """Server recieve players."""
     players = []
     s = socket.create_server(("", 5000))
     s.listen(4)
