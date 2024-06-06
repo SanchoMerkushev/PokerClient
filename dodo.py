@@ -61,6 +61,5 @@ def task_int():
     """Gen internationalization."""
     return {
         "actions": [
-            (create_folder, ['src/po/ru_RU.UTF-8/LC_MESSAGES']),
-            "pybabel compile -D msg -l ru_RU.UTF-8 -d src/po -i po/ru_RU.UTF-8/LC_MESSAGES/msg.po"],
+            "pybabel compile -D msg -l ru_RU.UTF-8 -d po -i po/ru_RU.UTF-8/LC_MESSAGES/msg.po"],
     }
