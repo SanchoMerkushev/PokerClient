@@ -8,8 +8,7 @@ from time import sleep
 
 from .misc import recv_end, END
 
-_podir = os.path.join(os.path.dirname(__file__), "../po")
-translation = gettext.translation("msg", _podir, fallback=True)
+translation = gettext.translation("msg", "po", fallback=True)
 _ = translation.gettext
 
 

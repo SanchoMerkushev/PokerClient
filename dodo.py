@@ -1,7 +1,5 @@
 """Tasks for doit."""
 
-from doit.tools import create_folder
-
 
 def task_html():
     """Return html documentation."""
@@ -17,7 +15,7 @@ def task_wheel():
     """Build client wheel."""
     return {
         'actions': ['python -m build -n -w'],
-        'task_dep': ['int'],
+        'task_dep': ['intern'],
     }
 
 
@@ -29,7 +27,7 @@ def task_client():
                     'short': 'n',
                     'default': '',
                     'help': "Choose name for PokerClient"}],
-        'task_dep': ['int'],
+        'task_dep': ['intern'],
     }
 
 
@@ -57,7 +55,7 @@ def task_tests():
     }
 
 
-def task_int():
+def task_intern():
     """Gen internationalization."""
     return {
         "actions": [
