@@ -34,7 +34,8 @@ def task_client():
 def task_server():
     """Run server."""
     return {
-        'actions': ['python -m src.server']
+        'actions': ['python -m src.server -t local'],
+        'task_dep': ['intern'],
     }
 
 

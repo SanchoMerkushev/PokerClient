@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Game server launcher."""
 import socket
+import argparse
+import gettext
 
-from .game import Game, HumanPlayer
+from .game import Game, HumanPlayer, ComputerPlayer, SelfPlayer
 from .misc import recv_end, END
+
+
+translation = gettext.translation("msg", "po", fallback=True)
+_ = translation.gettext
 
 
 def server_main():
@@ -20,5 +26,28 @@ def server_main():
     Game(players, 2).start()
 
 
+def local_main():
+    """Local play with bots."""
+    players = []
+    print(_("Enter your name:"))
+    self_name = input()
+    players.append(SelfPlayer(self_name))
+    print(_("Enter amount of bots:"))
+    amount_players = int(input())
+    while amount_players <= 0 or amount_players > 5:
+        print(_("Amount of bots must be between 1 and 5!"))
+        amount_players = int(input())
+    names = ["Alice", "Bob", "Chris", "Denis", "Eva"]
+    for i in range(amount_players):
+        players.append(ComputerPlayer(names[i]))
+    Game(players, 2).start()
+
+
 if __name__ == "__main__":
-    server_main()
+    parser: argparse.ArgumentParser = argparse.ArgumentParser()
+    parser.add_argument("-t", dest="type", type=str, required=True)
+    args: argparse.Namespace = parser.parse_args()
+    if args.type == "server":
+        server_main()
+    elif args.type == "local":
+        local_main()

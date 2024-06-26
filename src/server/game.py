@@ -1,12 +1,14 @@
 """Main game mechanics module."""
 from time import sleep
-from random import sample
+from random import sample, choices
 import json
 import gettext
 
 from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
 from .combinations import count_combination
 from .misc import recv_end, END
+from .client import UI
+
 
 translation = gettext.translation("msg", "po", fallback=True)
 _ = translation.gettext
@@ -14,9 +16,9 @@ _ = translation.gettext
 
 def send_inf_to_player(player, key, inf, answer=False):
     """Send data to player."""
-    sleep(0.01)
-    if not hasattr(player, "conn"):
+    if not isinstance(player, HumanPlayer):
         return
+    sleep(0.01)
     state = {key: inf}
     if answer:
         state["answer"] = True
@@ -26,6 +28,8 @@ def send_inf_to_player(player, key, inf, answer=False):
 
 def send_state_to_players(round_state, cur_player):
     """Send full game state."""
+    if not isinstance(cur_player, HumanPlayer):
+        return
     state = {
         "sync": True,
         "visible_cards": round_state.visible_cards,
@@ -33,7 +37,7 @@ def send_state_to_players(round_state, cur_player):
     }
     players = {}
     for player in round_state.players:
-        cards = player.cards if player.fold else [("X", "X"), ("X", "X")]
+        cards = [("F", "F"), ("F", "F")] if player.fold else [("X", "X"), ("X", "X")]
         players[player.name] = {
             "name": player.name,
             "fold": player.fold,
@@ -46,6 +50,31 @@ def send_state_to_players(round_state, cur_player):
     for player in round_state.players:
         data = json.dumps(state) + END
         player.conn.sendall(data.encode())
+
+
+def send_self_states(round_state, cur_player):
+    """Send full game state."""
+    if not isinstance(cur_player, SelfPlayer):
+        return
+    state = {
+        "sync": True,
+        "visible_cards": round_state.visible_cards,
+        "sum_bids": round_state.sum_bids,
+    }
+    players = {}
+    for player in round_state.players:
+        cards = [("F", "F"), ("F", "F")] if player.fold else [("X", "X"), ("X", "X")]
+        players[player.name] = {
+            "name": player.name,
+            "fold": player.fold,
+            "bid": player.bid,
+            "cards": cards,
+            "balance": player.balance,
+            "turn": player.name == cur_player.name
+        }
+    state["players"] = players
+    ui_obj = UI()
+    ui_obj.print_state(state, cur_player.name, cur_player.cards)
 
 
 class Player:
@@ -85,6 +114,20 @@ class Player:
                 combination_str += " " + RANKS[rank]
         self.my_combination_str = combination_str
 
+    def turn_fold(self):
+        self.fold = True
+        self.raise_bid = False
+
+    def turn_call(self, opponent_bid):
+        self.balance -= opponent_bid - self.bid
+        self.bid = opponent_bid
+        self.raise_bid = False
+
+    def turn_raise(self, opponent_bid, amount):
+        self.balance -= opponent_bid - self.bid + amount
+        self.bid = opponent_bid + amount
+        self.raise_bid = True
+
 
 class HumanPlayer(Player):
     """Implementation of Player class for Human input."""
@@ -111,20 +154,15 @@ class HumanPlayer(Player):
             command = recv_end(self.conn, END)
             command = list(map(str.upper, command.split()))
             if command[0] == "FOLD":
-                self.fold = True
-                self.raise_bid = False
+                self.turn_fold()
                 break
             elif command[0] == "CALL":
-                self.balance -= opponent_bid - self.bid
-                self.bid = opponent_bid
-                self.raise_bid = False
+                self.turn_call(opponent_bid)
                 break
             elif command[0] == "RAISE" and len(command) > 1:
                 amount = int(command[1])
                 if opponent_bid - self.bid + amount <= self.balance:
-                    self.balance -= opponent_bid - self.bid + amount
-                    self.bid = opponent_bid + amount
-                    self.raise_bid = True
+                    self.turn_raise(opponent_bid, amount)
                     break
                 else:
                     inf = _("Not enough money, your maximum raise is {}").format(self.balance - opponent_bid + self.bid)
@@ -139,7 +177,47 @@ class ComputerPlayer(Player):
 
     def turn(self, opponent_bid):
         """Bot logic."""
-        pass
+        type_turn = choices((0, 1, 2), weights=[1, 100, 30])[0]
+        if type_turn == 0:
+            self.turn_fold()
+        elif type_turn == 1:
+            self.turn_call(opponent_bid)
+        elif type_turn == 2:
+            self.turn_raise(20, opponent_bid)
+
+
+class SelfPlayer(Player):
+    """Implementation of Player class for Self player."""
+
+    def turn(self, opponent_bid):
+        """Turn logic."""
+        inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
+        if self.bid < opponent_bid:
+            inf += _("CALL costs {} or RAISE smth over opponent bid or FOLD\n").format(opponent_bid - self.bid)
+        else:
+            inf += _("CALL (it is free) or RAISE\n")
+        inf += _("Write FOLD or CALL or RAISE [AMOUNT]")
+        print(inf)
+        while True:
+            command = input()
+            command = list(map(str.upper, command.split()))
+            if command[0] == "FOLD":
+                self.turn_fold()
+                break
+            elif command[0] == "CALL":
+                self.turn_call(opponent_bid)
+                break
+            elif command[0] == "RAISE" and len(command) > 1:
+                amount = int(command[1])
+                if opponent_bid - self.bid + amount <= self.balance:
+                    self.turn_raise(opponent_bid, amount)
+                    break
+                else:
+                    inf = _("Not enough money, your maximum raise is {}").format(self.balance - opponent_bid + self.bid)
+                    print(inf)
+            else:
+                inf = _("Wrong command try FOLD or CALL or RAISE [AMOUNT]")
+                print(inf)
 
 
 class Round:
@@ -178,6 +256,7 @@ class Round:
         for player in win_players:
             player.balance += win_size
         inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
+        print(inf)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
         sleep(0.01)
@@ -190,6 +269,7 @@ class Round:
             end_round = False
             for player in self.players:
                 send_state_to_players(self, player)
+                send_self_states(self, player)
                 if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
                     player.turn(opponent_bid)
                     opponent_bid = max(opponent_bid, player.bid)
@@ -205,8 +285,13 @@ class Round:
         for i in range(amount_visible_cards):
             self.visible_cards[i] = self.table_cards[i]
 
+    def big_blind(self):
+        """Pay big blind."""
+        return
+
     def play(self):
         """Game loop."""
+        self.big_blind()
         self.open_cards(0)
         self.set_bids()
         self.open_cards(3)
@@ -228,7 +313,12 @@ class Game:
     def start(self):
         """Start a game."""
         cur_players = self.players
-        for _ in range(self.max_rounds):
+        print()
+        print(_("Start Game with {} players").format(len(self.players)))
+        for player in cur_players:
+            print(player.name, player.balance)
+        print()
+        for amount in range(self.max_rounds):
             game = Round(cur_players)
             for player in cur_players:
                 player.my_combination(game.table_cards)
