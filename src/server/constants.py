@@ -1,6 +1,7 @@
 """Game specific constants."""
 
 START_BALANCE = 1000
+BIG_BLIND_SIZE = 50
 CARDS_ON_TABLE = 5
 CARDS_ON_HAND = 2
 AMOUNT_RANKS = 13

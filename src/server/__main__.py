@@ -40,7 +40,7 @@ def local_main():
     names = ["Alice", "Bob", "Chris", "Denis", "Eva"]
     for i in range(amount_players):
         players.append(ComputerPlayer(names[i]))
-    Game(players, 2).start()
+    Game(players, 10).start()
 
 
 if __name__ == "__main__":

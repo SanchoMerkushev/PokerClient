@@ -3,8 +3,9 @@ from time import sleep
 from random import sample, choices
 import json
 import gettext
+import os
 
-from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS
+from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS, BIG_BLIND_SIZE
 from .combinations import count_combination
 from .misc import recv_end, END
 from .client import UI
@@ -115,15 +116,18 @@ class Player:
         self.my_combination_str = combination_str
 
     def turn_fold(self):
+        """Do basic fold."""
         self.fold = True
         self.raise_bid = False
 
     def turn_call(self, opponent_bid):
+        """Do basic call."""
         self.balance -= opponent_bid - self.bid
         self.bid = opponent_bid
         self.raise_bid = False
 
     def turn_raise(self, opponent_bid, amount):
+        """Do basic raise."""
         self.balance -= opponent_bid - self.bid + amount
         self.bid = opponent_bid + amount
         self.raise_bid = True
@@ -141,7 +145,7 @@ class HumanPlayer(Player):
         """Disconnect player."""
         self.conn.close()
 
-    def turn(self, opponent_bid):
+    def turn(self, opponent_bid, max_raise):
         """Fold or call or raise."""
         inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
@@ -149,7 +153,6 @@ class HumanPlayer(Player):
         else:
             inf += _("CALL (it is free) or RAISE\n")
         inf += _("Write FOLD or CALL or RAISE [N]")
-        send_inf_to_player(self, "output_inf", inf, answer=True)
         while True:
             command = recv_end(self.conn, END)
             command = list(map(str.upper, command.split()))
@@ -166,18 +169,17 @@ class HumanPlayer(Player):
                     break
                 else:
                     inf = _("Not enough money, your maximum raise is {}").format(self.balance - opponent_bid + self.bid)
-                    send_inf_to_player(self, "output_inf", inf, answer=True)
             else:
                 inf = _("Wrong command try FOLD or CALL or RAISE [N]")
-                send_inf_to_player(self, "output_inf", inf, answer=True)
+        print()
 
 
 class ComputerPlayer(Player):
     """Implementation of Player class for Bot player."""
 
-    def turn(self, opponent_bid):
+    def turn(self, opponent_bid, max_raise):
         """Bot logic."""
-        type_turn = choices((0, 1, 2), weights=[1, 100, 30])[0]
+        type_turn = choices((0, 1, 2), weights=[40, 100, 30])[0]
         if type_turn == 0:
             self.turn_fold()
         elif type_turn == 1:
@@ -189,7 +191,7 @@ class ComputerPlayer(Player):
 class SelfPlayer(Player):
     """Implementation of Player class for Self player."""
 
-    def turn(self, opponent_bid):
+    def turn(self, opponent_bid, max_raise):
         """Turn logic."""
         inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
@@ -209,7 +211,10 @@ class SelfPlayer(Player):
                 break
             elif command[0] == "RAISE" and len(command) > 1:
                 amount = int(command[1])
-                if opponent_bid - self.bid + amount <= self.balance:
+                if amount > max_raise:
+                    inf = _("Maximum raise of Round is {}").format(max_raise)
+                    print(inf)
+                elif opponent_bid - self.bid + amount <= self.balance:
                     self.turn_raise(opponent_bid, amount)
                     break
                 else:
@@ -246,37 +251,52 @@ class Round:
         win_combination = -1, None, None
         for player in self.players:
             if player.fold:
+                player.fold = False
                 continue
             if player.my_combination(self.table_cards) > win_combination:
                 win_players = [player]
             elif player.my_combination(self.table_cards) == win_combination:
                 win_players.append(player)
             win_combination = max(win_combination, player.my_combination(self.table_cards))
-        win_size = self.sum_bids / len(win_players)
+        win_size = self.sum_bids // len(win_players)
         for player in win_players:
             player.balance += win_size
+        os.system("clear")
         inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
         print(inf)
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
-        sleep(0.01)
 
     def set_bids(self):
         """Round logic."""
-        opponent_bid = 0
+        amount_not_fold = 0
+        for player in self.players:
+            if not player.fold:
+                amount_not_fold += 1
+        if amount_not_fold <= 1:
+            return
+        opponent_bid = self.players[-1].bid
         end_round = True
         while end_round:
             end_round = False
+            max_raise = self.players[0].balance - self.players[0].bid
+            for player in self.players:
+                max_raise = min(max_raise, player.balance - player.bid)
             for player in self.players:
                 send_state_to_players(self, player)
                 send_self_states(self, player)
                 if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
-                    player.turn(opponent_bid)
+                    player.turn(opponent_bid, max_raise)
                     opponent_bid = max(opponent_bid, player.bid)
                     end_round = end_round or player.raise_bid
+                    if player.fold:
+                        amount_not_fold -= 1
+                    if amount_not_fold <= 1:
+                        return
                 player.first_bid_of_round = False
         for player in self.players:
             player.first_bid_of_round = True
+            player.raise_bid = False
             self.sum_bids += player.bid
             player.bid = 0
 
@@ -287,7 +307,7 @@ class Round:
 
     def big_blind(self):
         """Pay big blind."""
-        return
+        self.players[-1].turn_raise(0, BIG_BLIND_SIZE)
 
     def play(self):
         """Game loop."""
@@ -310,20 +330,37 @@ class Game:
         self.players = players
         self.max_rounds = max_rounds
 
+    def rotate_players(self):
+        """Remove players with zero balance and rotate."""
+        new_players = []
+        for player in self.players:
+            if player.balance > 0:
+                new_players.append(player)
+            else:
+                if isinstance(player, SelfPlayer):
+                    print(_("{} your lost all!\nGAME OVER!!!").format(player.name))
+                    exit()
+                print(_("{} exit the game").format(player.name))
+        if len(new_players) == 1:
+            print(_("{} YOUR WIN ALL!!!!").format(player.name))
+            exit()
+        self.players = new_players[1:] + new_players[:1]
+
     def start(self):
         """Start a game."""
-        cur_players = self.players
         print()
         print(_("Start Game with {} players").format(len(self.players)))
-        for player in cur_players:
+        for player in self.players:
             print(player.name, player.balance)
         print()
         for amount in range(self.max_rounds):
-            game = Round(cur_players)
-            for player in cur_players:
+            game = Round(self.players)
+            for player in self.players:
                 player.my_combination(game.table_cards)
             game.play()
-            for player in cur_players:
+            sleep(1)
+            self.rotate_players()
+            for player in self.players:
                 print(player.name, player.balance)
             print()
         self.disconnect_all()

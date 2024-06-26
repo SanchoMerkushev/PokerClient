@@ -50,7 +50,7 @@ def task_tests():
     """Run tests."""
     return {
         "actions": [
-            "python -m unittest tests/test_* -v",
+            "python3 -m unittest tests/test_* -v",
         ],
         'task_dep': ['lint'],
     }
