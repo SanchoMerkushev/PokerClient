@@ -20,5 +20,4 @@ src = "src"
 src = ["po/*/*/*.mo"]
 
 [project.scripts]
-PokerClient = "src.client.__main__:client_main"
 PokerServer = "src.server.__main__:server_main"

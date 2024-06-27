@@ -46,10 +46,4 @@ def local_main():
 
 
 if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
-    parser.add_argument("-t", dest="type", type=str, required=True)
-    args: argparse.Namespace = parser.parse_args()
-    if args.type == "server":
-        server_main()
-    elif args.type == "local":
-        local_main()
+    local_main()
