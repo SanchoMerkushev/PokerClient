@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-07 13:45+0300\n"
+"POT-Creation-Date: 2024-06-27 13:33+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,79 +17,129 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: client.py:35
+#: src/client/client.py:33 src/server/print_information.py:29
 msgid "Players: \t"
 msgstr ""
 
-#: client.py:36
+#: src/client/client.py:34 src/server/print_information.py:30
 msgid "Balances:\t"
 msgstr ""
 
-#: client.py:37
+#: src/client/client.py:35 src/server/print_information.py:31
 msgid "Cards:   \t"
 msgstr ""
 
-#: client.py:38
+#: src/client/client.py:36 src/server/print_information.py:32
 msgid "Bids:    \t"
 msgstr ""
 
-#: client.py:39
+#: src/client/client.py:37 src/server/print_information.py:33
 msgid "Turns:   \t"
 msgstr ""
 
-#: client.py:53
+#: src/client/client.py:51 src/server/print_information.py:47
 msgid "Bank: {}"
 msgstr ""
 
-#: client.py:99 client.py:115 client.py:128
+#: src/client/client.py:97 src/client/client.py:113 src/client/client.py:126
 msgid "It's not your turn."
 msgstr ""
 
-#: client.py:105
+#: src/client/client.py:103
 msgid "RAISE value must be integer bigger than one."
 msgstr ""
 
-#: client.py:118
+#: src/client/client.py:116
 msgid "CALL doesn't need any arguments."
 msgstr ""
 
-#: client.py:130
+#: src/client/client.py:128
 msgid "FOLD doesn't need any arguments."
 msgstr ""
 
-#: client.py:139
+#: src/client/client.py:137
 msgid "Unknown command:"
 msgstr ""
 
-#: game.py:81
+#: src/server/__main__.py:32
+msgid "Enter your name:"
+msgstr ""
+
+#: src/server/__main__.py:35
+msgid "Enter amount of bots:"
+msgstr ""
+
+#: src/server/__main__.py:38
+msgid "Amount of bots must be between 1 and 5!"
+msgstr ""
+
+#: src/server/__main__.py:41
+msgid "Choose aggression of player between -5 and 5"
+msgstr ""
+
+#: src/server/__main__.py:43
+msgid "Aggression for {}:"
+msgstr ""
+
+#: src/server/game.py:114
 msgid " with another cards"
 msgstr ""
 
-#: game.py:99
+#: src/server/game.py:151 src/server/game.py:201
 msgid "{} your bid {} opponent bid is {}\n"
 msgstr ""
 
-#: game.py:101
+#: src/server/game.py:153 src/server/game.py:203
 msgid "CALL costs {} or RAISE smth over opponent bid or FOLD\n"
 msgstr ""
 
-#: game.py:103
+#: src/server/game.py:155 src/server/game.py:205
 msgid "CALL (it is free) or RAISE\n"
 msgstr ""
 
-#: game.py:104
+#: src/server/game.py:156
 msgid "Write FOLD or CALL or RAISE [N]"
 msgstr ""
 
-#: game.py:126
+#: src/server/game.py:172 src/server/game.py:226
 msgid "Not enough money, your maximum raise is {}"
 msgstr ""
 
-#: game.py:129
+#: src/server/game.py:174
 msgid "Wrong command try FOLD or CALL or RAISE [N]"
 msgstr ""
 
-#: game.py:175
+#: src/server/game.py:206
+msgid "Write FOLD or CALL or RAISE [AMOUNT]"
+msgstr ""
+
+#: src/server/game.py:220
+msgid "Maximum raise of Round is {}"
+msgstr ""
+
+#: src/server/game.py:229
+msgid "Wrong command try FOLD or CALL or RAISE [AMOUNT]"
+msgstr ""
+
+#: src/server/game.py:270
 msgid "Winner - {} win {} with {}"
+msgstr ""
+
+#: src/server/game.py:352
+msgid ""
+"{} your lost all!\n"
+"GAME OVER!!!"
+msgstr ""
+
+#: src/server/game.py:354
+msgid "{} exit the game"
+msgstr ""
+
+#: src/server/game.py:356
+msgid "{} YOUR WIN ALL!!!!"
+msgstr ""
+
+#: src/server/game.py:363
+msgid "Start Game with {} players"
 msgstr ""
 

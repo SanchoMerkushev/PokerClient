@@ -8,7 +8,7 @@ import os
 from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS, BIG_BLIND_SIZE
 from .combinations import count_combination
 from .misc import recv_end, END
-from .print_information import UI, cards_to_str
+from .print_information import UI
 from .bot_logic import decision
 
 
@@ -368,7 +368,7 @@ class Game:
             game = Round(self.players)
             for player in self.players:
                 player.my_combination(game.table_cards)
-                print(cards_to_str(player.cards))
+                # print(cards_to_str(player.cards))
             game.play()
             sleep(1)
             self.rotate_players()
