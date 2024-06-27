@@ -38,8 +38,10 @@ def local_main():
         print(_("Amount of bots must be between 1 and 5!"))
         amount_players = int(input())
     names = ["Alice", "Bob", "Chris", "Denis", "Eva"]
+    print(_("Choose aggression of player between -5 and 5"))
     for i in range(amount_players):
-        players.append(ComputerPlayer(names[i]))
+        print(_("Aggression for {}:").format(names[i]))
+        players.append(ComputerPlayer(names[i], int(input())))
     Game(players, 10).start()
 
 

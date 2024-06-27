@@ -1,6 +1,6 @@
 """Main game mechanics module."""
 from time import sleep
-from random import sample, choices
+from random import sample
 import json
 import gettext
 import os
@@ -8,7 +8,8 @@ import os
 from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS, BIG_BLIND_SIZE
 from .combinations import count_combination
 from .misc import recv_end, END
-from .print_information import UI
+from .print_information import UI, cards_to_str
+from .bot_logic import decision
 
 
 translation = gettext.translation("msg", "po", fallback=True)
@@ -145,7 +146,7 @@ class HumanPlayer(Player):
         """Disconnect player."""
         self.conn.close()
 
-    def turn(self, opponent_bid, max_raise):
+    def turn(self, opponent_bid, max_raise, visible_cards):
         """Fold or call or raise."""
         inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
@@ -177,21 +178,25 @@ class HumanPlayer(Player):
 class ComputerPlayer(Player):
     """Implementation of Player class for Bot player."""
 
-    def turn(self, opponent_bid, max_raise):
+    def __init__(self, name, aggresive=0):
+        super().__init__(name)
+        self.aggresive = 0
+
+    def turn(self, opponent_bid, max_raise, visible_cards):
         """Bot logic."""
-        type_turn = choices((0, 1, 2), weights=[40, 100, 30])[0]
-        if type_turn == 0:
+        type_turn = decision(self.cards, visible_cards, opponent_bid, max_raise, self.balance, self.aggresive)
+        if type_turn[0] == "FOLD":
             self.turn_fold()
-        elif type_turn == 1:
+        elif type_turn[0] == "CALL":
             self.turn_call(opponent_bid)
-        elif type_turn == 2:
-            self.turn_raise(20, opponent_bid)
+        elif type_turn[0] == "RAISE":
+            self.turn_raise(opponent_bid, type_turn[1])
 
 
 class SelfPlayer(Player):
     """Implementation of Player class for Self player."""
 
-    def turn(self, opponent_bid, max_raise):
+    def turn(self, opponent_bid, max_raise, visible_cards):
         """Turn logic."""
         inf = _("{} your bid {} opponent bid is {}\n").format(self.name, self.bid, opponent_bid)
         if self.bid < opponent_bid:
@@ -267,6 +272,14 @@ class Round:
         for player in self.players:
             send_inf_to_player(player, "finish_round", inf)
 
+    def summarise(self):
+        """Sum all bids and change balance."""
+        for player in self.players:
+            player.first_bid_of_round = True
+            player.raise_bid = False
+            self.sum_bids += player.bid
+            player.bid = 0
+
     def set_bids(self):
         """Round logic."""
         amount_not_fold = 0
@@ -274,6 +287,7 @@ class Round:
             if not player.fold:
                 amount_not_fold += 1
         if amount_not_fold <= 1:
+            self.summarise()
             return
         opponent_bid = self.players[-1].bid
         end_round = True
@@ -286,19 +300,16 @@ class Round:
                 send_state_to_players(self, player)
                 send_self_states(self, player)
                 if not player.fold and not (player.bid == opponent_bid and not player.first_bid_of_round):
-                    player.turn(opponent_bid, max_raise)
+                    player.turn(opponent_bid, max_raise, self.visible_cards)
                     opponent_bid = max(opponent_bid, player.bid)
                     end_round = end_round or player.raise_bid
                     if player.fold:
                         amount_not_fold -= 1
                     if amount_not_fold <= 1:
+                        self.summarise()
                         return
                 player.first_bid_of_round = False
-        for player in self.players:
-            player.first_bid_of_round = True
-            player.raise_bid = False
-            self.sum_bids += player.bid
-            player.bid = 0
+        self.summarise()
 
     def open_cards(self, amount_visible_cards):
         """Open common cards."""
@@ -357,6 +368,7 @@ class Game:
             game = Round(self.players)
             for player in self.players:
                 player.my_combination(game.table_cards)
+                print(cards_to_str(player.cards))
             game.play()
             sleep(1)
             self.rotate_players()
