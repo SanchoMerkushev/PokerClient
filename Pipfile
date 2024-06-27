@@ -4,6 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flake8 = "*"
+flake8-docstrings = "*"
+wheel = "*"
+doit = "*"
+build = "*"
+sphinx = "*"
+setuptools = "*"
 
 [dev-packages]
 babel = "*"

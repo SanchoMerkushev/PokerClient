@@ -3,7 +3,6 @@ from time import sleep
 from random import sample
 import json
 import gettext
-import os
 
 from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS, BIG_BLIND_SIZE
 from .combinations import count_combination
@@ -266,7 +265,6 @@ class Round:
         win_size = self.sum_bids // len(win_players)
         for player in win_players:
             player.balance += win_size
-        os.system("clear")
         inf = _("Winner - {} win {} with {}").format(player.name, win_size, player.my_combination_str)
         print(inf)
         for player in self.players:
