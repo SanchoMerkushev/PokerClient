@@ -8,7 +8,7 @@ import os
 from .constants import COMBINATIONS, CARDS_ON_TABLE, CARDS_ON_HAND, ALL_CARDS, START_BALANCE, RANKS, BIG_BLIND_SIZE
 from .combinations import count_combination
 from .misc import recv_end, END
-from .client import UI
+from .print_information import UI
 
 
 translation = gettext.translation("msg", "po", fallback=True)

@@ -5,7 +5,7 @@ def task_html():
     """Return html documentation."""
     return {
         "actions": [
-            "sphinx-apidoc -o docs/ src",
+            "sphinx-apidoc -f -o docs/ src",
             "sphinx-build -M html docs build"
         ],
     }
@@ -50,7 +50,7 @@ def task_tests():
     """Run tests."""
     return {
         "actions": [
-            "python3 -m unittest tests/test_* -v",
+            "python -m unittest tests/test_* -v",
         ],
         'task_dep': ['lint'],
     }
